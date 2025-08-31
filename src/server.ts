@@ -1,16 +1,12 @@
 // src/server.ts
 import app from './app';
 import { logger } from './shared/logger';
-import { connectDatabase, query } from './shared/database';
 import config from './config';
 
 const PORT = config.port || 3000;
-const dbUser = config.db.user;
 
 async function startServer() {
   try {
-    // await connectDatabase();
-    logger.info('Database connected successfully');
 
     const server = app.listen(PORT, () => {
       logger.info(`🚀 Server running on port ${PORT}`);

@@ -1,36 +1,55 @@
 import { Pool } from 'pg';
+import { Request, Response, NextFunction } from 'express';
+require('dotenv').config()
+// Extend Request type to include `pool`
+declare global {
+  namespace Express {
+    interface Request {
+      pool: Pool;
+    }
+  }
+}
 
-let pool: Pool;
+const pool = new Pool({
+  connectionString: process.env.CONNECTION_STRING
+});
 
-export const connectDatabase = async () => {
-  console.log(process.env.DB_HOST, 'process.env.DB_HOST');
+// Test connection at startup (fail fast)
+pool.connect()
+  .then(client => {
+    return client
+      .query('SELECT NOW()')
+      .then(res => {
+        console.log('✅ PostgreSQL connected at:', res.rows[0].now);
+      })
+      .catch(err => {
+        console.error('❌ PostgreSQL test query failed:', err);
+        process.exit(1); // stop app if DB is unreachable
+      })
+      .finally(() => client.release());
+  })
+  .catch(err => {
+    console.error('❌ PostgreSQL connection error:', err);
+    process.exit(1);
+  });
+
+// Middleware: attach pool to request
+export const databaseMiddleware = (req: Request, res: Response, next: NextFunction) => {
   if (!pool) {
-    pool = new Pool({
-      host: process.env.DB_HOST || 'localhost',
-      port: Number(process.env.DB_PORT) || 5432,
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'password',
-      database: process.env.DB_NAME || 'mydb',
-      max: 10, // max connections
-      idleTimeoutMillis: 30000, // close idle clients after 30s
-    });
+    console.error('❌ Database pool is not initialized');
+    return res.status(500).json({ error: 'Database not available' });
   }
 
-  try {
-    await pool.query('SELECT NOW()'); // test connection
-    console.log('✅ Connected to PostgreSQL');
-  } catch (error) {
-    console.error('❌ PostgreSQL connection error:', error);
-    throw error;
-  }
-
-  return pool;
+  req.pool = pool;
+  next();
 };
 
-// Export a helper to run queries
+// Helper to run queries with logging
 export const query = async (text: string, params?: any[]) => {
-  if (!pool) {
-    throw new Error('Database not connected. Call connectDatabase first.');
+  try {
+    return await pool.query(text, params);
+  } catch (err) {
+    console.error('❌ Database query error:', { text, params, err });
+    throw err;
   }
-  return pool.query(text, params);
 };
