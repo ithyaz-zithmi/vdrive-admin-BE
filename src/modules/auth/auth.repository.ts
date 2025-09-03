@@ -11,7 +11,7 @@ export const AuthRepository = {
     role: string;
   }): Promise<User> {
     const result = await query(
-      'INSERT INTO users (name, password, contact, alternateContact, role) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, contact, alternateContact',
+      'INSERT INTO users (name, password, contact, "alternateContact", role) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, contact, "alternateContact"',
       [data.name, data.password, data.contact, data.alternateContact, data.role]
     );
     return result.rows[0];
@@ -24,7 +24,7 @@ export const AuthRepository = {
   },
   async getUserDataBasedOnResetToken(data: { resetToken: string }): Promise<User> {
     const result = await query(
-      'SELECT id, name, resetToken, resetTokenExpiry  FROM users WHERE resetToken = $1',
+      'SELECT id, name, "resetToken", "resetTokenExpiry"  FROM users WHERE "resetToken" = $1',
       [data.resetToken]
     );
     return result.rows[0];
@@ -37,7 +37,7 @@ export const AuthRepository = {
     resetToken: string;
     expiresAt: Date | null;
   }): Promise<void> {
-    await query('UPDATE users SET resetToken = $1, resetTokenExpiry = $2 WHERE id = $3', [
+    await query('UPDATE users SET "resetToken" = $1, "resetTokenExpiry" = $2 WHERE id = $3', [
       data.resetToken,
       data.expiresAt,
       data.userId,
