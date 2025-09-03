@@ -32,7 +32,7 @@ const rateLimiter = rateLimit({
 });
 
 // Security Middlewares
-const security = [helmet(), xssClean(), hpp()];
+const security = [helmet(), hpp()];
 
 // CORS
 const corsMiddleware = cors({

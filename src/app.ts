@@ -3,12 +3,12 @@ import express from 'express';
 import { errorHandler } from './shared/errorHandler';
 import { logger } from './shared/logger';
 import { middlewares } from './shared/middlewares';
-// import routes from "./routes";
+import routes from './routes';
 import xssClean from 'xss-clean';
 
 const app = express();
 
-app.use(xssClean());
+// app.use(xssClean());
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
@@ -23,7 +23,7 @@ app.use(middlewares.corsMiddleware);
 app.use(middlewares.compressionMiddleware);
 
 // Routes
-// app.use("/api", routes);
+app.use('/api', routes);
 
 app.get('/', (req, res) => {
   res.status(200).json({
