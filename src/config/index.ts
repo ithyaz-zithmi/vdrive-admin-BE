@@ -11,6 +11,8 @@ interface Config {
     user: string;
     password: string;
     name: string;
+    sslMode: string;
+    channelBinding: string;
   };
   jwt: {
     secret: string;
@@ -33,7 +35,8 @@ const config: Config = {
     port: Number(process.env.DB_PORT) || 5432,
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'password',
-    name: process.env.DB_NAME || 'mydb',
+    sslMode: process.env.PGSSLMODE || '',
+    channelBinding: process.env.PGCHANNELBINDING || '',
   },
   jwt: {
     secret: process.env.JWT_SECRET || '',

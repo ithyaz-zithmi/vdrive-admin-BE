@@ -13,6 +13,8 @@ export const connectDatabase = async () => {
       database: process.env.DB_NAME || 'mydb',
       max: 10, // max connections
       idleTimeoutMillis: 30000, // close idle clients after 30s
+      ssl: process.env.PGSSLMODE === 'require' ? { rejectUnauthorized: false } : false,
+      ...(process.env.PGCHANNELBINDING === 'require' && { application_name: 'myapp' }),
     });
   }
 
