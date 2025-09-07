@@ -35,6 +35,7 @@ const config: Config = {
     port: Number(process.env.DB_PORT) || 5432,
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'password',
+    name: process.env.DB_NAME || 'mydb',
     sslMode: process.env.PGSSLMODE || '',
     channelBinding: process.env.PGCHANNELBINDING || '',
   },

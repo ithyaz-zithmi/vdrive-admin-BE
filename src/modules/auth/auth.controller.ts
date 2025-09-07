@@ -17,7 +17,11 @@ export const AuthController = {
     try {
       const { user_name, password } = req.body;
       const token = await AuthService.signIn({ user_name, password });
-      return successResponse(res, 200, 'Sign-in successful', { token });
+      return successResponse(
+        res.cookie('auth_token', token, { httpOnly: true, secure: true, sameSite: 'strict' }),
+        201,
+        'User signed in successfully'
+      );
     } catch (err) {
       next(err);
     }
