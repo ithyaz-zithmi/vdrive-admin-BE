@@ -13,17 +13,17 @@ export const AuthService = {
   hashPassword(password: string): Promise<string> {
     return bcrypt.hash(password, 10);
   },
-  validatePassword(password: string, hashedPassword: string): Promise<boolean> {
-    return bcrypt.compare(password, hashedPassword);
+  validatePassword(password: string, hashed_password: string): Promise<boolean> {
+    return bcrypt.compare(password, hashed_password);
   },
-  checkUserName(userName: string): string {
+  checkUserName(user_name: string): string {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     const phoneRegex = /^\d{7,15}$/;
 
-    if (emailRegex.test(userName)) {
+    if (emailRegex.test(user_name)) {
       return 'Email';
-    } else if (phoneRegex.test(userName)) {
+    } else if (phoneRegex.test(user_name)) {
       return 'Phone number';
     } else {
       return 'Invalid input';
@@ -33,14 +33,14 @@ export const AuthService = {
     name: string;
     password: string;
     contact: string;
-    alternateContact: string;
+    alternate_contact: string;
     role: string;
   }): Promise<User> {
-    const hashedPassword = await AuthService.hashPassword(data.password);
-    return await AuthRepository.createAdmin({ ...data, password: hashedPassword });
+    const hashed_password = await AuthService.hashPassword(data.password);
+    return await AuthRepository.createAdmin({ ...data, password: hashed_password });
   },
-  async signIn(data: { userName: string; password: string }): Promise<string> {
-    let userData = await AuthRepository.getUserData({ userName: data?.userName });
+  async signIn(data: { user_name: string; password: string }): Promise<string> {
+    let userData = await AuthRepository.getUserData({ user_name: data?.user_name });
     if (!userData) {
       throw { statusCode: 401, message: 'Invalid credentials' };
     }
@@ -48,18 +48,18 @@ export const AuthService = {
     if (!isPasswordValid) {
       throw { statusCode: 401, message: 'Invalid credentials' };
     }
-    const token = jwt.sign({ id: userData.id, username: userData.contact }, config.jwt.secret, {
+    const token = jwt.sign({ id: userData.id, user_name: userData.contact }, config.jwt.secret, {
       expiresIn: config.jwt.expiresIn,
     });
 
     return token;
   },
-  async forgotPassword(data: { userName: string }): Promise<boolean> {
-    let userData = await AuthRepository.getUserData({ userName: data?.userName });
+  async forgotPassword(data: { user_name: string }): Promise<boolean> {
+    let userData = await AuthRepository.getUserData({ user_name: data?.user_name });
     if (!userData) {
       throw { statusCode: 404, message: 'User not found' };
     }
-    let type = AuthService.checkUserName(data?.userName);
+    let type = AuthService.checkUserName(data?.user_name);
     switch (type) {
       case 'Email':
         const resetToken = AuthService.generateResetToken();
@@ -68,14 +68,14 @@ export const AuthService = {
         // Save reset token to database
         await AuthRepository.storeResetToken({
           userId: userData.id,
-          resetToken,
-          expiresAt: resetTokenExpiry,
+          reset_token: resetToken,
+          expires_at: resetTokenExpiry,
         });
 
         // Email configuration
         const resetUrl = `${config.prodURL}/reset-password?token=${resetToken}`;
         sendMail({
-          to: [data?.userName],
+          to: [data?.user_name],
           subject: 'Password Reset Request',
           body: `
             <h2>Password Reset</h2>
@@ -91,23 +91,23 @@ export const AuthService = {
     }
     return true;
   },
-  async resetPassword(data: { resetToken: string; newPassword: string }): Promise<boolean> {
+  async resetPassword(data: { reset_token: string; new_password: string }): Promise<boolean> {
     const user = await AuthRepository.getUserDataBasedOnResetToken({
-      resetToken: data.resetToken,
+      reset_token: data.reset_token,
     });
     if (!user) {
       throw { statusCode: 400, message: 'Invalid or expired reset token' };
     }
-    if (!user?.resetTokenExpiry || new Date() > new Date(user?.resetTokenExpiry)) {
+    if (!user?.reset_token_expiry || new Date() > new Date(user?.reset_token_expiry)) {
       throw { statusCode: 400, message: 'Reset token has expired' };
     }
-    const hashedPassword = await AuthService.hashPassword(data.newPassword);
-    await AuthRepository.updatePassword({ userId: user.id, newPassword: hashedPassword });
+    const hashedPassword = await AuthService.hashPassword(data.new_password);
+    await AuthRepository.updatePassword({ userId: user.id, new_password: hashedPassword });
     // Clear reset token and expiry
     await AuthRepository.storeResetToken({
       userId: user.id,
-      resetToken: '',
-      expiresAt: null,
+      reset_token: '',
+      expires_at: null,
     });
     return true;
   },

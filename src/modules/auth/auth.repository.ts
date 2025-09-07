@@ -7,39 +7,39 @@ export const AuthRepository = {
     name: string;
     password: string;
     contact: string;
-    alternateContact: string;
+    alternate_contact: string;
     role: string;
   }): Promise<User> {
     const result = await query(
-      'INSERT INTO users (name, password, contact, "alternateContact", role) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, contact, "alternateContact"',
-      [data.name, data.password, data.contact, data.alternateContact, data.role]
+      'INSERT INTO users (name, password, contact, alternate_contact, role) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, contact, alternate_contact',
+      [data.name, data.password, data.contact, data.alternate_contact, data.role]
     );
     return result.rows[0];
   },
-  async getUserData(data: { userName: string }): Promise<User> {
+  async getUserData(data: { user_name: string }): Promise<User> {
     const result = await query('SELECT id, name, password FROM users WHERE contact = $1', [
-      data.userName,
+      data.user_name,
     ]);
     return result.rows[0];
   },
-  async getUserDataBasedOnResetToken(data: { resetToken: string }): Promise<User> {
+  async getUserDataBasedOnResetToken(data: { reset_token: string }): Promise<User> {
     const result = await query(
-      'SELECT id, name, "resetToken", "resetTokenExpiry"  FROM users WHERE "resetToken" = $1',
-      [data.resetToken]
+      'SELECT id, name, reset_token, reset_token_expiry  FROM users WHERE reset_token = $1',
+      [data.reset_token]
     );
     return result.rows[0];
   },
-  async updatePassword(data: { userId: string; newPassword: string }): Promise<void> {
-    await query('UPDATE users SET password = $1 WHERE id = $2', [data.newPassword, data.userId]);
+  async updatePassword(data: { userId: string; new_password: string }): Promise<void> {
+    await query('UPDATE users SET password = $1 WHERE id = $2', [data.new_password, data.userId]);
   },
   async storeResetToken(data: {
     userId: string;
-    resetToken: string;
-    expiresAt: Date | null;
+    reset_token: string;
+    expires_at: Date | null;
   }): Promise<void> {
-    await query('UPDATE users SET "resetToken" = $1, "resetTokenExpiry" = $2 WHERE id = $3', [
-      data.resetToken,
-      data.expiresAt,
+    await query('UPDATE users SET reset_token = $1, reset_token_expiry = $2 WHERE id = $3', [
+      data.reset_token,
+      data.expires_at,
       data.userId,
     ]);
   },

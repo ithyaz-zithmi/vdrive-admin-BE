@@ -24,7 +24,7 @@ router.post(
         .messages({
           'alternatives.match': 'Contact must be a valid email or phone number.',
         }),
-      alternateContact: Joi.string()
+      alternate_contact: Joi.string()
         .pattern(/^[0-9]{6,15}$/) // phone only
         .allow('') // can be empty
         .messages({
@@ -38,7 +38,7 @@ router.post(
   '/signin',
   celebrate({
     [Segments.BODY]: Joi.object().keys({
-      userName: Joi.alternatives()
+      user_name: Joi.alternatives()
         .try(
           Joi.string().email(),
           Joi.string().pattern(/^[0-9]{6,15}$/) // phone: 6–15 digits
@@ -59,7 +59,7 @@ router.post(
   '/forgot-password',
   celebrate({
     [Segments.BODY]: Joi.object().keys({
-      userName: Joi.alternatives()
+      user_name: Joi.alternatives()
         .try(
           Joi.string().email(),
           Joi.string().pattern(/^[0-9]{6,15}$/) // phone: 6–15 digits
@@ -76,8 +76,8 @@ router.post(
   '/reset-password',
   celebrate({
     [Segments.BODY]: Joi.object().keys({
-      resetToken: Joi.string().required(),
-      newPassword: Joi.string().required().min(5).max(18).pattern(passwordRegex).messages({
+      reset_token: Joi.string().required(),
+      new_password: Joi.string().required().min(5).max(18).pattern(passwordRegex).messages({
         'string.pattern.base':
           'Password must contain at least 1 uppercase letter, 1 number, and 1 special character.',
       }),

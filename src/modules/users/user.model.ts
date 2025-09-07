@@ -4,10 +4,10 @@ export interface User {
   name: string;
   password: string;
   contact: string;
-  alternateContact?: string;
+  alternate_contact?: string;
   role: 'customer' | 'admin';
-  resetToken: string | null;
-  resetTokenExpiry: Date | null;
+  reset_token: string | null;
+  reset_token_expiry: Date | null;
   created_at: Date;
   updated_at: Date;
 }

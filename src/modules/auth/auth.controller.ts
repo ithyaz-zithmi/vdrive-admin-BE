@@ -15,8 +15,8 @@ export const AuthController = {
   },
   async signIn(req: Request, res: Response, next: NextFunction) {
     try {
-      const { userName, password } = req.body;
-      const token = await AuthService.signIn({ userName, password });
+      const { user_name, password } = req.body;
+      const token = await AuthService.signIn({ user_name, password });
       return successResponse(res, 200, 'Sign-in successful', { token });
     } catch (err) {
       next(err);
@@ -24,8 +24,8 @@ export const AuthController = {
   },
   async forgotPassword(req: Request, res: Response, next: NextFunction) {
     try {
-      const { userName } = req.body;
-      await AuthService.forgotPassword({ userName });
+      const { user_name } = req.body;
+      await AuthService.forgotPassword({ user_name });
       return successResponse(res, 200, 'Forgot password link sent successfully');
     } catch (err) {
       next(err);
@@ -33,8 +33,8 @@ export const AuthController = {
   },
   async resetPassword(req: Request, res: Response, next: NextFunction) {
     try {
-      const { resetToken, newPassword } = req.body;
-      await AuthService.resetPassword({ resetToken, newPassword });
+      const { reset_token, new_password } = req.body;
+      await AuthService.resetPassword({ reset_token, new_password });
       return successResponse(res, 200, 'Password reset successfully');
     } catch (err) {
       next(err);
