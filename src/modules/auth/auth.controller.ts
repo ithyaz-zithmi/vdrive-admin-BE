@@ -44,4 +44,12 @@ export const AuthController = {
       next(err);
     }
   },
+  async signOut(req: Request, res: Response, next: NextFunction) {
+    try {
+      res.clearCookie('auth_token');
+      return successResponse(res, 200, 'User signed out successfully');
+    } catch (err) {
+      next(err);
+    }
+  },
 };

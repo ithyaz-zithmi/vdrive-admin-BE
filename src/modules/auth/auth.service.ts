@@ -1,7 +1,7 @@
 // src/modules/users/user.service.ts
 import { AuthRepository } from './auth.repository';
 import * as bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
 import config from '../../config';
 import { sendMail } from '../../shared/sendEmail';
 import { User } from '../users/user.model';
@@ -48,9 +48,10 @@ export const AuthService = {
     if (!isPasswordValid) {
       throw { statusCode: 401, message: 'Invalid credentials' };
     }
-    const token = jwt.sign({ id: userData.id, user_name: userData.contact }, config.jwt.secret, {
-      expiresIn: config.jwt.expiresIn,
-    });
+    const payload: JwtPayload & { id: string } = { id: userData.id };
+
+    const options: SignOptions = { expiresIn: config.jwt.expiresIn };
+    const token = jwt.sign(payload, config.jwt.secret, options);
 
     return token;
   },

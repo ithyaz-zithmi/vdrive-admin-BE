@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { SignOptions } from 'jsonwebtoken';
 
 dotenv.config();
 
@@ -16,7 +17,7 @@ interface Config {
   };
   jwt: {
     secret: string;
-    expiresIn: string;
+    expiresIn: SignOptions['expiresIn'];
   };
   prodURL: string;
   email: {
@@ -41,7 +42,7 @@ const config: Config = {
   },
   jwt: {
     secret: process.env.JWT_SECRET || '',
-    expiresIn: process.env.JWT_EXPIRES_IN || '1h',
+    expiresIn: (process.env.JWT_EXPIRES_IN || '1h') as SignOptions['expiresIn'],
   },
   prodURL: process.env.PROD_URL || 'http://localhost:3000',
   email: {

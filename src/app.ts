@@ -3,6 +3,7 @@ import express from 'express';
 import { errorHandler } from './shared/errorHandler';
 import { logger } from './shared/logger';
 import { middlewares } from './shared/middlewares';
+import cookieParser from 'cookie-parser';
 import routes from './routes';
 import xssClean from 'xss-clean';
 
@@ -13,6 +14,7 @@ const app = express();
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Core middlewares
 app.use(middlewares.requestId);

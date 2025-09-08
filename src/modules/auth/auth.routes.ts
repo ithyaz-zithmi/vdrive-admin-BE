@@ -2,6 +2,7 @@
 import { Router } from 'express';
 import { AuthController } from './auth.controller';
 import { celebrate, Joi, Segments } from 'celebrate';
+import isAuthenticated from '../../shared/authentication';
 const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{5,18}$/;
 
 const router = Router();
@@ -85,5 +86,7 @@ router.post(
   }),
   AuthController.resetPassword
 );
+
+router.get('/signout', isAuthenticated, AuthController.signOut);
 
 export default router;
