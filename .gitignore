@@ -6,8 +6,6 @@ dist/
 *.js
 *.js.map
 
-# VS Code
-.vscode/
 
 # Mac system files
 .DS_Store

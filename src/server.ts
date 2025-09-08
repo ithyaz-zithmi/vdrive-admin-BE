@@ -9,7 +9,7 @@ const dbUser = config.db.user;
 
 async function startServer() {
   try {
-    // await connectDatabase();
+    await connectDatabase();
     logger.info('Database connected successfully');
 
     const server = app.listen(PORT, () => {
