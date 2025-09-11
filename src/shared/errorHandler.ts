@@ -2,6 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from './logger';
+import { isCelebrateError } from 'celebrate';
 
 const SERVICE_NAME = process.env.SERVICE_NAME || 'driver-booking-service';
 const VERSION = process.env.API_VERSION || 'v1';
@@ -43,27 +44,34 @@ export const successResponse = (
 
 export const errorHandler = (err: any, req: Request, res: Response, _next: NextFunction) => {
   const requestId = (req as any).requestId || uuidv4();
-  const statusCode = err.statusCode || 500;
+  let statusCode = err.statusCode || 500;
+  let message = err.message || 'Internal server error';
+  let errorDetails: any = err.details || err.message;
+
+  // Handle Celebrate/Joi validation errors
+  if (isCelebrateError(err)) {
+    statusCode = 400; // Bad Request
+    const validationErrors: Record<string, string[]> = {};
+
+    // err.details is a Map internally
+    for (const [key, joiError] of err.details.entries()) {
+      validationErrors[key] = joiError.details.map((d) => d.message);
+    }
+
+    message = 'Validation error';
+    errorDetails = validationErrors;
+  }
 
   const error = {
     code: err.code || mapStatusCodeToErrorCode(statusCode),
-    details: err.details || err.message || 'An unexpected error occurred',
+    details: errorDetails,
   };
 
   logger.error(`[${requestId}] ${err.stack || err.message}`);
 
   return res
     .status(statusCode)
-    .json(
-      buildResponse(
-        statusCode,
-        false,
-        err.message || 'Internal server error',
-        null,
-        error,
-        requestId
-      )
-    );
+    .json(buildResponse(statusCode, false, message, null, error, requestId));
 };
 
 const mapStatusCodeToErrorCode = (statusCode: number) => {
