@@ -1,6 +1,6 @@
 import { query } from '../shared/database';
 
-const truncateTables = ['areas', 'cities', 'states', 'countries', 'users'];
+const truncateTables = ['areas', 'cities', 'states', 'countries'];
 
 async function clearDb() {
   try {

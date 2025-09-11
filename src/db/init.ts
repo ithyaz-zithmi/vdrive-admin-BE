@@ -1,10 +1,6 @@
 import { query } from '../shared/database';
 
 const createTables = [
-  `DROP SCHEMA IF EXISTS public CASCADE;`,
-  `CREATE SCHEMA public;`,
-  `GRANT ALL ON SCHEMA public TO postgres;`,
-  // Extension
   `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`,
 
   // ==============================
