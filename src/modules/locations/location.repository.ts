@@ -111,12 +111,12 @@ export const LocationRepository = {
 
     if (search) {
       params.push(`%${search}%`);
-      sql += ` AND area_name ILIKE $${params.length}`;
+      sql += ` AND place ILIKE $${params.length}`;
     }
 
     const countRes = await query(sql.replace('*', 'COUNT(*)'), params);
 
-    sql += ` ORDER BY area_name ASC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    sql += ` ORDER BY place ASC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
     params.push(limit, offset);
 
     const result = await query(sql, params);

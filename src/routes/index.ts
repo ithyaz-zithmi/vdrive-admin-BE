@@ -3,6 +3,7 @@ import { Router } from 'express';
 import userRoutes from '../modules/users/user.routes';
 import authRoutes from '../modules/auth/auth.routes';
 import isAuthenticated from '../shared/authentication';
+import locationRoutes from '../modules/locations/location.routes';
 
 const router = Router();
 
@@ -11,6 +12,7 @@ router.get('/health-check', (req, res) => {
 });
 router.use('/auth', authRoutes);
 router.use(isAuthenticated);
+router.use('/locations', locationRoutes);
 router.use('/users', userRoutes);
 
 export default router;
