@@ -153,6 +153,7 @@
     "seed": "ts-node  src/db/setup.ts",
     "build": "tsc",
     "start": "tsc && node dist/server.js",
+    "setup": "npm install && npm run build",
     "migrate": "node -r ts-node/register ./node_modules/.bin/node-pg-migrate"
   },
   "jest": {
