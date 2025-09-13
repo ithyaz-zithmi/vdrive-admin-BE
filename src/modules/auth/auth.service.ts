@@ -157,4 +157,8 @@ export const AuthService = {
     });
     return true;
   },
+
+  async getMe(userId: string): Promise<User | null> {
+    return await AuthRepository.getUserProfileById(userId);
+  },
 };

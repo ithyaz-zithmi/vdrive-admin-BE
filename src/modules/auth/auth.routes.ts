@@ -91,6 +91,7 @@ router.post(
 router.post('/refresh-token', AuthController.refreshAccessToken);
 
 router.use(isAuthenticated);
+router.get('/me', AuthController.getMe);
 router.post('/signout', AuthController.signOut);
 
 export default router;

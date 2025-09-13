@@ -47,4 +47,12 @@ export const AuthRepository = {
       data.userId,
     ]);
   },
+
+  async getUserProfileById(userId: string): Promise<User | null> {
+    const result = await query(
+      'SELECT id, name, contact, alternate_contact, role, created_at, updated_at FROM users WHERE id = $1',
+      [userId]
+    );
+    return result.rows[0] || null;
+  },
 };
