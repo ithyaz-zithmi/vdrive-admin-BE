@@ -59,8 +59,6 @@ router.post(
   AuthController.resetPassword
 );
 
-router.use(isAuthenticated);
-
 router.post(
   '/admin',
   celebrate({
@@ -90,6 +88,10 @@ router.post(
   AuthController.createAdmin
 );
 
-router.get('/signout', AuthController.signOut);
+router.use(isAuthenticated);
+
+router.post('/refresh-token', AuthController.refreshAccessToken);
+
+router.post('/signout', AuthController.signOut);
 
 export default router;

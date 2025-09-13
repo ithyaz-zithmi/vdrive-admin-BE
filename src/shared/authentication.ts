@@ -9,9 +9,16 @@ interface AuthRequest extends Request {
 
 const isAuthenticated = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const token = req.cookies['auth_token'];
+    // Perfect method: Bearer token in Authorization header
+    let token = req.headers.authorization?.replace('Bearer ', '');
+
     if (!token) {
-      return res.status(401).json({ statusCode: 401, success: false, message: 'Unauthorized' });
+      return res.status(401).json({
+        statusCode: 401,
+        success: false,
+        message: 'Unauthorized: No access token provided',
+        code: 'NO_ACCESS_TOKEN',
+      });
     }
 
     // jwt.verify handles expiry + invalid signature
@@ -20,19 +27,44 @@ const isAuthenticated = async (req: AuthRequest, res: Response, next: NextFuncti
     };
 
     if (!decoded?.id) {
-      return res.status(401).json({ statusCode: 401, success: false, message: 'Invalid token' });
+      return res.status(401).json({
+        statusCode: 401,
+        success: false,
+        message: 'Invalid access token',
+        code: 'INVALID_TOKEN',
+      });
     }
 
-    // Check if user exists in DB
-    const user = await UserRepository.findById(decoded.id);
-    if (!user) {
-      return res.status(401).json({ statusCode: 401, success: false, message: 'User not found' });
-    }
+    // Optimized: Don't query user from database for every request
+    // User ID is embedded in JWT payload - no DB query needed!
+    req.user = { id: decoded.id } as any;
 
-    req.user = user; // properly typed
     next();
   } catch (err: any) {
-    return res.status(401).json({ statusCode: 401, success: false, message: 'Unauthorized' });
+    // More specific error messages for different JWT errors
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        statusCode: 401,
+        success: false,
+        message: 'Access token expired',
+        code: 'TOKEN_EXPIRED',
+        shouldRefresh: true,
+      });
+    } else if (err.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        statusCode: 401,
+        success: false,
+        message: 'Invalid access token',
+        code: 'INVALID_TOKEN_FORMAT',
+      });
+    } else {
+      return res.status(401).json({
+        statusCode: 401,
+        success: false,
+        message: 'Unauthorized: Token verification failed',
+        code: 'TOKEN_VERIFICATION_FAILED',
+      });
+    }
   }
 };
 

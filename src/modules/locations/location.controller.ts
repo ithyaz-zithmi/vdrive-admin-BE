@@ -6,7 +6,11 @@ class LocationController {
   static async getCountries(req: Request, res: Response, next: NextFunction) {
     try {
       const { search = '', page, limit } = req.query;
-      const countries = await LocationService.getCountries(search, page, limit);
+      const countries = await LocationService.getCountries(
+        search as string,
+        parseInt(page as string, 10) || 1,
+        parseInt(limit as string, 10) || 10
+      );
       return successResponse(res, 200, 'Countries fetched successfully', countries);
     } catch (err) {
       next(err);
@@ -17,7 +21,12 @@ class LocationController {
     try {
       const { country_id } = req.params;
       const { search, page, limit } = req.query;
-      const states = await LocationService.getStates(country_id, search, page, limit);
+      const states = await LocationService.getStates(
+        country_id,
+        (search as string) || '',
+        parseInt(page as string, 10) || 1,
+        parseInt(limit as string, 10) || 10
+      );
       return successResponse(res, 200, 'States fetched successfully', states);
     } catch (err) {
       next(err);
@@ -28,7 +37,13 @@ class LocationController {
     try {
       const { country_id } = req.params;
       const { state_id, search, page, limit } = req.query;
-      const cities = await LocationService.getCities(country_id, state_id, search, page, limit);
+      const cities = await LocationService.getCities(
+        country_id,
+        (state_id as string) || null,
+        (search as string) || '',
+        parseInt(page as string, 10) || 1,
+        parseInt(limit as string, 10) || 10
+      );
       return successResponse(res, 200, 'Cities fetched successfully', cities);
     } catch (err) {
       next(err);
@@ -41,11 +56,11 @@ class LocationController {
       const { state_id, city_id, search, page, limit } = req.query;
       const areas = await LocationService.getAreas(
         country_id,
-        state_id,
-        city_id,
-        search,
-        page,
-        limit
+        (state_id as string) || null,
+        (city_id as string) || null,
+        (search as string) || '',
+        parseInt(page as string, 10) || 1,
+        parseInt(limit as string, 10) || 10
       );
       return successResponse(res, 200, 'Areas fetched successfully', areas);
     } catch (err) {
@@ -56,7 +71,7 @@ class LocationController {
   static async getFullLocation(req: Request, res: Response, next: NextFunction) {
     try {
       const { area_id } = req.params;
-      const location = await LocationService.getFullLocation(parseInt(area_id, 10));
+      const location = await LocationService.getFullLocation(area_id);
       return successResponse(res, 200, 'Full location fetched successfully', location);
     } catch (err) {
       next(err);

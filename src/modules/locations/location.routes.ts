@@ -82,7 +82,7 @@ router.post(
     [Segments.BODY]: Joi.object().keys({
       country_code: Joi.string().required(),
       country_name: Joi.string().required(),
-      country_flag: Joi.string().uri().optional(),
+      country_flag: Joi.string().optional(),
     }),
   }),
   LocationController.addCountry

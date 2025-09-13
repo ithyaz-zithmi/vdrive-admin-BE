@@ -36,7 +36,7 @@ const security = [helmet(), hpp()];
 
 // CORS
 const corsMiddleware = cors({
-  origin: ['http://localhost:3000', 'https://yourdomain.com'],
+  origin: true,
   credentials: true,
 });
 

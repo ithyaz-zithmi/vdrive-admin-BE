@@ -22,6 +22,10 @@ export const AuthRepository = {
     ]);
     return result.rows[0];
   },
+  async getUserDataById(userId: string): Promise<User> {
+    const result = await query('SELECT id, name, password FROM users WHERE id = $1', [userId]);
+    return result.rows[0];
+  },
   async getUserDataBasedOnResetToken(data: { reset_token: string }): Promise<User> {
     const result = await query(
       'SELECT id, name, reset_token, reset_token_expiry  FROM users WHERE reset_token = $1',
