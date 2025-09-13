@@ -88,10 +88,9 @@ router.post(
   AuthController.createAdmin
 );
 
-router.use(isAuthenticated);
-
 router.post('/refresh-token', AuthController.refreshAccessToken);
 
+router.use(isAuthenticated);
 router.post('/signout', AuthController.signOut);
 
 export default router;
