@@ -5,7 +5,6 @@ import { logger } from './shared/logger';
 import { middlewares } from './shared/middlewares';
 import cookieParser from 'cookie-parser';
 import routes from './routes';
-import xssClean from 'xss-clean';
 
 const app = express();
 

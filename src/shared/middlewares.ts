@@ -6,7 +6,6 @@ import cors from 'cors';
 import compression from 'compression';
 import morgan from 'morgan';
 import hpp from 'hpp';
-import xssClean from 'xss-clean';
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from './logger';
 
