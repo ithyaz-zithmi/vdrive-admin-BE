@@ -151,7 +151,7 @@
     "test:price-settings": "jest __tests__ --testNamePattern=\"Price\"",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "seed": "ts-node  src/db/setup.ts",
-    "start": "ts-node src/server.ts",
+    "start": "ts-node --transpile-only src/server.ts",
     "migrate": "node -r ts-node/register ./node_modules/.bin/node-pg-migrate"
   },
   "jest": {
