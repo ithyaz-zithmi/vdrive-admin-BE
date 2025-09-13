@@ -39,7 +39,54 @@ export const AuthService = {
     const hashed_password = await AuthService.hashPassword(data.password);
     return await AuthRepository.createAdmin({ ...data, password: hashed_password });
   },
-  async signIn(data: { user_name: string; password: string }): Promise<string> {
+  generateTokens(payload: JwtPayload & { id: string }) {
+    const accessTokenOptions: SignOptions = { expiresIn: config.jwt.expiresIn };
+    const refreshTokenOptions: SignOptions = { expiresIn: config.jwt.refreshExpiresIn };
+
+    const accessToken = jwt.sign(payload, config.jwt.secret, accessTokenOptions);
+    const refreshToken = jwt.sign(
+      { id: payload.id },
+      config.jwt.refreshSecret,
+      refreshTokenOptions
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  },
+
+  async refreshAccessToken(refreshToken: string): Promise<string> {
+    try {
+      const decoded = jwt.verify(refreshToken, config.jwt.refreshSecret) as JwtPayload & {
+        id: string;
+      };
+
+      if (!decoded?.id) {
+        throw { statusCode: 401, message: 'Invalid refresh token' };
+      }
+
+      // Check if user exists
+      const userData = await AuthRepository.getUserDataById(decoded.id);
+      if (!userData) {
+        throw { statusCode: 401, message: 'User not found' };
+      }
+
+      // Generate new access token
+      const payload: JwtPayload & { id: string } = { id: userData.id };
+      const accessTokenOptions: SignOptions = { expiresIn: config.jwt.expiresIn };
+      const newAccessToken = jwt.sign(payload, config.jwt.secret, accessTokenOptions);
+
+      return newAccessToken;
+    } catch (error) {
+      throw { statusCode: 401, message: 'Invalid or expired refresh token' };
+    }
+  },
+
+  async signIn(data: {
+    user_name: string;
+    password: string;
+  }): Promise<{ accessToken: string; refreshToken: string }> {
     let userData = await AuthRepository.getUserData({ user_name: data?.user_name });
     if (!userData) {
       throw { statusCode: 401, message: 'Invalid credentials' };
@@ -50,10 +97,8 @@ export const AuthService = {
     }
     const payload: JwtPayload & { id: string } = { id: userData.id };
 
-    const options: SignOptions = { expiresIn: config.jwt.expiresIn };
-    const token = jwt.sign(payload, config.jwt.secret, options);
-
-    return token;
+    const tokens = AuthService.generateTokens(payload);
+    return tokens;
   },
   async forgotPassword(data: { user_name: string }): Promise<boolean> {
     let userData = await AuthRepository.getUserData({ user_name: data?.user_name });

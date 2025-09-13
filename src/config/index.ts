@@ -18,6 +18,8 @@ interface Config {
   jwt: {
     secret: string;
     expiresIn: SignOptions['expiresIn'];
+    refreshSecret: string;
+    refreshExpiresIn: SignOptions['expiresIn'];
   };
   prodURL: string;
   email: {
@@ -43,6 +45,8 @@ const config: Config = {
   jwt: {
     secret: process.env.JWT_SECRET || '',
     expiresIn: (process.env.JWT_EXPIRES_IN || '1h') as SignOptions['expiresIn'],
+    refreshSecret: process.env.JWT_REFRESH_SECRET || 'refresh-secret',
+    refreshExpiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || '7d') as SignOptions['expiresIn'],
   },
   prodURL: process.env.PROD_URL || 'http://localhost:3000',
   email: {
