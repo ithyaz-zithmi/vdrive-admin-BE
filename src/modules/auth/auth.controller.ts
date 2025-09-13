@@ -7,6 +7,10 @@ import ms from 'ms';
 import config from '../../config';
 import jwt from 'jsonwebtoken';
 
+interface AuthRequest extends Request {
+  user?: { id: string };
+}
+
 export const AuthController = {
   async createAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { user_name, password } = req.body;
@@ -138,6 +142,31 @@ export const AuthController = {
       });
     } catch (error: any) {
       logger.warn(`Token refresh failed: ${error.message}`);
+      next(error);
+    }
+  },
+
+  async getMe(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.id;
+
+      if (!userId) {
+        logger.warn('getMe called without user ID');
+        throw { statusCode: 401, message: 'User not authenticated' };
+      }
+
+      logger.info(`Fetching profile for user ID: ${userId}`);
+      const userProfile = await AuthService.getMe(userId);
+
+      if (!userProfile) {
+        logger.warn(`User not found for ID: ${userId}`);
+        throw { statusCode: 404, message: 'User not found' };
+      }
+
+      logger.info(`Profile fetched successfully for user ID: ${userId}`);
+      successResponse(res, 200, 'User profile retrieved successfully', userProfile);
+    } catch (error: any) {
+      logger.error(`getMe error: ${error.message}`);
       next(error);
     }
   },
