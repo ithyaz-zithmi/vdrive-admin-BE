@@ -80,6 +80,17 @@ CREATE TABLE IF NOT EXISTS hotspots (
   multiplier NUMERIC(10,2) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS packages (
+  id                  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  package_name        VARCHAR(255) NOT NULL,
+  duration_minutes    NUMERIC(10,2) NOT NULL,
+  distance_km         NUMERIC(10,2) NOT NULL,
+  extra_distance_km   NUMERIC(10,2) NOT NULL,
+  extra_minutes       NUMERIC(10,2) NOT NULL,
+  created_at          TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at          TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS created_locations (
   location_id   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   country       VARCHAR(100) NOT NULL,

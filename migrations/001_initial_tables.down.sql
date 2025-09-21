@@ -3,6 +3,7 @@
 DROP TABLE IF EXISTS timings;
 DROP TABLE IF EXISTS rate_details;
 DROP TABLE IF EXISTS created_locations;
+DROP TABLE IF EXISTS packages;
 DROP TABLE IF EXISTS hotspots;
 DROP TABLE IF EXISTS areas;
 DROP TABLE IF EXISTS cities;
