@@ -6,6 +6,7 @@ import isAuthenticated from '../shared/authentication';
 import locationRoutes from '../modules/locations/location.routes';
 import hotspotRoutes from '../modules/hotspots/hotspot.routes';
 import priceSettingsRoutes from '../modules/price-settings/price.routes';
+import packageRoutes from '../modules/packages/package.routes';
 
 const router = Router();
 
@@ -17,6 +18,7 @@ router.use(isAuthenticated);
 router.use('/locations', locationRoutes);
 router.use('/hotspots', hotspotRoutes);
 router.use('/price-settings', priceSettingsRoutes);
+router.use('/packages', packageRoutes);
 router.use('/users', userRoutes);
 
 export default router;
