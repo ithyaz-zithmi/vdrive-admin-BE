@@ -62,7 +62,7 @@ export const AuthController = {
         secure: isProduction,
         maxAge: refreshTokenExpiry,
         sameSite: 'strict',
-        domain: isProduction ? process.env.COOKIE_DOMAIN : undefined,
+        // domain: isProduction ? process.env.COOKIE_DOMAIN : undefined,
         path: '/api/auth',
       });
 
