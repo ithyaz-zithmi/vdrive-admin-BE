@@ -2,31 +2,63 @@ import { Pool } from 'pg';
 
 let pool: Pool;
 
+// export const connectDatabase = async () => {
+//   console.log(process.env.DB_HOST, 'process.env.DB_HOST');
+//   if (!pool) {
+//     pool = new Pool({
+//       host: process.env.DB_HOST || 'localhost',
+//       port: Number(process.env.DB_PORT) || 5432,
+//       user: process.env.DB_USER || 'postgres',
+//       password: process.env.DB_PASSWORD || 'password',
+//       database: process.env.DB_NAME || 'mydb',
+//       max: 10, // max connections
+//       idleTimeoutMillis: 30000, // close idle clients after 30s
+//       ssl: process.env.PGSSLMODE === 'require' ? { rejectUnauthorized: false } : false,
+//       ...(process.env.PGCHANNELBINDING === 'require' && { application_name: 'myapp' }),
+//     });
+//   }
+
+//   try {
+//     await pool.query('SELECT NOW()'); // test connection
+//     console.log('✅ Connected to PostgreSQL');
+//   } catch (error) {
+//     console.error('❌ PostgreSQL connection error:', error);
+//     throw error;
+//   }
+
+//   return pool;
+// };
 export const connectDatabase = async () => {
-  console.log(process.env.DB_HOST, 'process.env.DB_HOST');
-  if (!pool) {
-    pool = new Pool({
-      host: process.env.DB_HOST || 'localhost',
-      port: Number(process.env.DB_PORT) || 5432,
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'password',
-      database: process.env.DB_NAME || 'mydb',
-      max: 10, // max connections
-      idleTimeoutMillis: 30000, // close idle clients after 30s
-      ssl: process.env.PGSSLMODE === 'require' ? { rejectUnauthorized: false } : false,
-      ...(process.env.PGCHANNELBINDING === 'require' && { application_name: 'myapp' }),
-    });
-  }
-
   try {
-    await pool.query('SELECT NOW()'); // test connection
-    console.log('✅ Connected to PostgreSQL');
-  } catch (error) {
-    console.error('❌ PostgreSQL connection error:', error);
-    throw error;
-  }
+    console.log(process.env.DB_HOST, 'process.env.DB_HOST');
 
-  return pool;
+    if (!pool) {
+      pool = new Pool({
+        host: process.env.DB_HOST || 'localhost',
+        port: Number(process.env.DB_PORT) || 5432,
+        user: process.env.DB_USER || 'postgres',
+        password: process.env.DB_PASSWORD || 'password',
+        database: process.env.DB_NAME || 'mydb',
+        max: 10,
+        idleTimeoutMillis: 30000,
+        ssl: process.env.PGSSLMODE === 'require' ? { rejectUnauthorized: false } : false,
+        ...(process.env.PGCHANNELBINDING === 'require' && {
+          application_name: 'myapp',
+        }),
+      });
+    }
+
+    // Test connection
+    await pool.query('SELECT NOW()');
+    console.log('✅ Connected to PostgreSQL');
+
+    return pool;
+  } catch (error) {
+    console.error('❌ PostgreSQL connection failed:', error.message || error);
+    // Optional detailed debugging:
+    console.error('🔍 Full error:', error);
+    throw new Error('Database connection failed');
+  }
 };
 
 // Export a helper to run queries
