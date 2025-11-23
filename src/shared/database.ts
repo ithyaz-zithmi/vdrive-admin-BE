@@ -54,7 +54,8 @@ export const connectDatabase = async () => {
 
     return pool;
   } catch (error) {
-    console.error('❌ PostgreSQL connection failed:', error.message || error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('❌ PostgreSQL connection failed:', errorMessage);
     // Optional detailed debugging:
     console.error('🔍 Full error:', error);
     throw new Error('Database connection failed');
