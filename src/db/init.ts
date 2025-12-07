@@ -79,6 +79,113 @@ const createTables = [
     CONSTRAINT areas_unique UNIQUE (place, city_id, country_id, zipcode)
   );
   `,
+
+  // ==============================
+  // DRIVERS
+  // ==============================
+  `
+  CREATE TABLE IF NOT EXISTS drivers (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    full_name VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    profile_pic_url TEXT,
+    dob DATE NOT NULL,
+    gender VARCHAR(10) CHECK (gender IN ('male', 'female', 'other')) NOT NULL,
+    address JSONB NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    rating DECIMAL(3, 2) DEFAULT 0.00,
+    total_trips INTEGER DEFAULT 0,
+    availability JSONB DEFAULT '{"online": false, "lastActive": null}'::jsonb,
+    kyc JSONB DEFAULT '{"overallStatus": "pending", "verifiedAt": null}'::jsonb,
+    credit JSONB DEFAULT '{"limit": 0, "balance": 0, "totalRecharged": 0, "totalUsed": 0, "lastRechargeAt": null}'::jsonb,
+    performance JSONB DEFAULT '{"averageRating": 0, "totalTrips": 0, "cancellations": 0, "lastActive": null}'::jsonb,
+    payments JSONB DEFAULT '{"totalEarnings": 0, "pendingPayout": 0, "commissionPaid": 0}'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  );
+  `,
+
+  // ==============================
+  // VEHICLES
+  // ==============================
+  `
+  CREATE TABLE IF NOT EXISTS vehicles (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    driver_id UUID REFERENCES drivers(id) ON DELETE CASCADE,
+    vehicle_number VARCHAR(50) NOT NULL UNIQUE,
+    vehicle_model VARCHAR(255) NOT NULL,
+    vehicle_type VARCHAR(100) NOT NULL,
+    fuel_type VARCHAR(50) NOT NULL,
+    registration_date DATE NOT NULL,
+    insurance_expiry DATE NOT NULL,
+    rc_document_url TEXT,
+    status BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  );
+  `,
+
+  // ==============================
+  // DRIVER DOCUMENTS
+  // ==============================
+  `
+  CREATE TABLE IF NOT EXISTS driver_documents (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    driver_id UUID NOT NULL REFERENCES drivers(id) ON DELETE CASCADE,
+    document_type VARCHAR(100) NOT NULL,
+    document_number VARCHAR(100) NOT NULL,
+    document_url TEXT NOT NULL,
+    license_status VARCHAR(50),
+    expiry_date DATE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  );
+  `,
+
+  // ==============================
+  // DRIVER RECHARGES
+  // ==============================
+  `
+  CREATE TABLE IF NOT EXISTS driver_recharges (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    driver_id UUID NOT NULL REFERENCES drivers(id) ON DELETE CASCADE,
+    amount DECIMAL(10, 2) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    reference VARCHAR(255),
+    status VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  );
+  `,
+
+  // ==============================
+  // DRIVER CREDIT USAGE
+  // ==============================
+  `
+  CREATE TABLE IF NOT EXISTS driver_credit_usage (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    driver_id UUID NOT NULL REFERENCES drivers(id) ON DELETE CASCADE,
+    trip_id VARCHAR(255),
+    amount DECIMAL(10, 2) NOT NULL,
+    type VARCHAR(100) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  );
+  `,
+
+  // ==============================
+  // DRIVER ACTIVITY LOGS
+  // ==============================
+  `
+  CREATE TABLE IF NOT EXISTS driver_activity_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    driver_id UUID NOT NULL REFERENCES drivers(id) ON DELETE CASCADE,
+    action VARCHAR(255) NOT NULL,
+    details TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  );
+  `,
 ];
 
 async function initDb() {

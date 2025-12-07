@@ -7,6 +7,8 @@ import locationRoutes from '../modules/locations/location.routes';
 import hotspotRoutes from '../modules/hotspots/hotspot.routes';
 import priceSettingsRoutes from '../modules/price-settings/price.routes';
 import packageRoutes from '../modules/packages/package.routes';
+import uploadRoutes from '../modules/upload/upload.routes';
+import driverRoutes from '../modules/drivers/driver.routes';
 
 const router = Router();
 
@@ -20,5 +22,8 @@ router.use('/hotspots', hotspotRoutes);
 router.use('/price-settings', priceSettingsRoutes);
 router.use('/packages', packageRoutes);
 router.use('/users', userRoutes);
+router.use('/upload', uploadRoutes);
+router.use('/drivers', driverRoutes);
+router.use('/', driverRoutes);
 
 export default router;
