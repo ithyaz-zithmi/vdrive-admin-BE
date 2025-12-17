@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
 import config from '../../config';
 import { sendMail } from '../../shared/sendEmail';
-import { User } from '../users/user.model';
+import { AdminUser } from '../admin-users/adminUser.model';
 
 export const AuthService = {
   generateResetToken(): string {
@@ -29,16 +29,7 @@ export const AuthService = {
       return 'Invalid input';
     }
   },
-  async createAdmin(data: {
-    name: string;
-    password: string;
-    contact: string;
-    alternate_contact: string;
-    role: string;
-  }): Promise<User> {
-    const hashed_password = await AuthService.hashPassword(data.password);
-    return await AuthRepository.createAdmin({ ...data, password: hashed_password });
-  },
+
   generateTokens(payload: JwtPayload & { id: string }) {
     const accessTokenOptions: SignOptions = { expiresIn: config.jwt.expiresIn };
     const refreshTokenOptions: SignOptions = { expiresIn: config.jwt.refreshExpiresIn };
@@ -158,7 +149,7 @@ export const AuthService = {
     return true;
   },
 
-  async getMe(userId: string): Promise<User | null> {
+  async getMe(userId: string): Promise<AdminUser | null> {
     return await AuthRepository.getUserProfileById(userId);
   },
 };

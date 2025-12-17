@@ -40,6 +40,7 @@
     "ajv": "^6.12.6",
     "ansi-styles": "^4.3.0",
     "argparse": "^2.0.1",
+    "axios": "^1.13.2",
     "balanced-match": "^1.0.2",
     "bcrypt": "^6.0.0",
     "brace-expansion": "^2.0.2",
@@ -150,11 +151,9 @@
     "test:hotspots": "jest __tests__ --testNamePattern=\"Hotspot\"",
     "test:price-settings": "jest __tests__ --testNamePattern=\"Price\"",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "seed": "ts-node  src/db/setup.ts",
     "build": "tsc",
     "start": "tsc && node dist/server.js",
-    "setup": "npm install && npm run build",
-    "migrate": "node -r ts-node/register ./node_modules/.bin/node-pg-migrate"
+    "setup": "npm install && npm run build"
   },
   "jest": {
     "preset": "ts-jest",

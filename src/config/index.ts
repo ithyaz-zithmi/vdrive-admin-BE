@@ -22,6 +22,8 @@ interface Config {
     refreshExpiresIn: SignOptions['expiresIn'];
   };
   prodURL: string;
+  userDriverApiUrl: string;
+  internalServiceApiKey: string;
   email: {
     service: string;
     user: string;
@@ -49,6 +51,8 @@ const config: Config = {
     refreshExpiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || '7d') as SignOptions['expiresIn'],
   },
   prodURL: process.env.PROD_URL || 'http://localhost:3000',
+  userDriverApiUrl: process.env.USER_DRIVER_API_URL || 'http://localhost:3001',
+  internalServiceApiKey: process.env.INTERNAL_SERVICE_API_KEY || '',
   email: {
     service: process.env.EMAIL_SERVICE || 'gmail',
     user: process.env.EMAIL_USER || '',
