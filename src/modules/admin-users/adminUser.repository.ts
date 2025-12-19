@@ -5,13 +5,15 @@ import { AdminUser } from './adminUser.model';
 export const AdminUserRepository = {
   async findAll(): Promise<AdminUser[]> {
     const result = await query(
-      'SELECT * FROM users WHERE is_deleted = false ORDER BY created_at DESC'
+      'SELECT * FROM admin_users WHERE is_deleted = false ORDER BY created_at DESC'
     );
     return result.rows;
   },
 
   async findById(id: string): Promise<AdminUser | null> {
-    const result = await query('SELECT * FROM users WHERE id = $1 AND is_deleted = false', [id]);
+    const result = await query('SELECT * FROM admin_users WHERE id = $1 AND is_deleted = false', [
+      id,
+    ]);
     return result.rows[0] || null;
   },
 
@@ -23,7 +25,7 @@ export const AdminUserRepository = {
     role: 'admin';
   }): Promise<AdminUser> {
     const result = await query(
-      'INSERT INTO users (name, password, contact, alternate_contact, role, is_deleted) VALUES ($1, $2, $3, $4, $5, false) RETURNING *',
+      'INSERT INTO admin_users (name, password, contact, alternate_contact, role, is_deleted) VALUES ($1, $2, $3, $4, $5, false) RETURNING *',
       [data.name, data.password, data.contact, data.alternate_contact || null, data.role]
     );
     return result.rows[0];
@@ -65,7 +67,7 @@ export const AdminUserRepository = {
     values.push(id);
 
     const result = await query(
-      `UPDATE users SET ${fields.join(', ')} WHERE id = $${index} AND is_deleted = false RETURNING *`,
+      `UPDATE admin_users SET ${fields.join(', ')} WHERE id = $${index} AND is_deleted = false RETURNING *`,
       values
     );
     return result.rows[0] || null;
@@ -73,7 +75,7 @@ export const AdminUserRepository = {
 
   async softDelete(id: string): Promise<boolean> {
     const result = await query(
-      'UPDATE users SET is_deleted = true, deleted_at = NOW() WHERE id = $1 AND is_deleted = false',
+      'UPDATE admin_users SET is_deleted = true, deleted_at = NOW() WHERE id = $1 AND is_deleted = false',
       [id]
     );
     return (result.rowCount || 0) > 0;
