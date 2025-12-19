@@ -12,25 +12,6 @@ interface AuthRequest extends Request {
 }
 
 export const AuthController = {
-  async createAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const { user_name, password } = req.body;
-
-    try {
-      logger.info(`Admin creation started: ${user_name}`);
-
-      const adminData = { ...req.body, role: 'admin' as const };
-      const newAdmin = await AuthService.createAdmin(adminData);
-
-      const { password: _, reset_token, reset_token_expiry, ...safeAdmin } = newAdmin as any;
-
-      logger.info(`🛡️ Admin created: ${user_name} (ID: ${newAdmin.id})`);
-      successResponse(res, 201, 'Admin user created successfully', safeAdmin);
-    } catch (error: any) {
-      logger.error(`❌ Admin creation failed: ${user_name} - ${error.message}`);
-      next(error);
-    }
-  },
-
   async signIn(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { user_name } = req.body;
 

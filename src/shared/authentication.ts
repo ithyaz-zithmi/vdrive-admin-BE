@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { UserRepository } from '../modules/users/user.repository';
-import { User } from '../modules/users/user.model';
+import { AdminUserRepository } from '../modules/admin-users/adminUser.repository';
+import { AdminUser } from '../modules/admin-users/adminUser.model';
 
 interface AuthRequest extends Request {
-  user?: User;
+  user?: AdminUser;
 }
 
 const isAuthenticated = async (req: AuthRequest, res: Response, next: NextFunction) => {

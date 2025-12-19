@@ -1,6 +1,7 @@
 // src/routes/index.ts
 import { Router } from 'express';
-import userRoutes from '../modules/users/user.routes';
+import userRoutes from '../modules/admin-users/adminUser.routes';
+import userManagementRoutes from '../modules/user-management/userManagement.routes';
 import authRoutes from '../modules/auth/auth.routes';
 import isAuthenticated from '../shared/authentication';
 import locationRoutes from '../modules/locations/location.routes';
@@ -19,6 +20,7 @@ router.use('/locations', locationRoutes);
 router.use('/hotspots', hotspotRoutes);
 router.use('/price-settings', priceSettingsRoutes);
 router.use('/packages', packageRoutes);
-router.use('/users', userRoutes);
+router.use('/admin-users', userRoutes);
+router.use('/users', userManagementRoutes);
 
 export default router;
