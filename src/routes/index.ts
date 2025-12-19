@@ -7,6 +7,7 @@ import locationRoutes from '../modules/locations/location.routes';
 import hotspotRoutes from '../modules/hotspots/hotspot.routes';
 import priceSettingsRoutes from '../modules/price-settings/price.routes';
 import packageRoutes from '../modules/packages/package.routes';
+import adminRoutes from '../modules/admins/admin.routes';
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use('/hotspots', hotspotRoutes);
 router.use('/price-settings', priceSettingsRoutes);
 router.use('/packages', packageRoutes);
 router.use('/users', userRoutes);
+router.use('/admins', adminRoutes);
 
 export default router;
