@@ -6,7 +6,7 @@ import { logger } from '../../shared/logger';
 export const UserManagementController = {
   async getCustomers(req: Request, res: Response, next: NextFunction) {
     try {
-      const response = await userDriverClient.get('/customers', {
+      const response = await userDriverClient.get('/api/users/customers', {
         params: req.query,
       });
       return res.status(response.status).json(response.data);
@@ -18,7 +18,7 @@ export const UserManagementController = {
 
   async getDrivers(req: Request, res: Response, next: NextFunction) {
     try {
-      const response = await userDriverClient.get('/drivers', {
+      const response = await userDriverClient.get('/api/users/drivers', {
         params: req.query,
       });
       return res.status(response.status).json(response.data);
@@ -31,7 +31,7 @@ export const UserManagementController = {
   async getUserById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const response = await userDriverClient.get(`/users/${id}`);
+      const response = await userDriverClient.get(`/api/users/${id}`);
       return res.status(response.status).json(response.data);
     } catch (err: any) {
       logger.error(`getUserById proxy error: ${err.message}`);
@@ -41,7 +41,7 @@ export const UserManagementController = {
 
   async createUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const response = await userDriverClient.post('/users/create', req.body);
+      const response = await userDriverClient.post('/api/users/create', req.body);
       return res.status(response.status).json(response.data);
     } catch (err: any) {
       logger.error(`createUser proxy error: ${err.message}`);
@@ -52,7 +52,7 @@ export const UserManagementController = {
   async updateUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const response = await userDriverClient.patch(`/users/update/${id}`, req.body);
+      const response = await userDriverClient.patch(`/api/users/update/${id}`, req.body);
       return res.status(response.status).json(response.data);
     } catch (err: any) {
       logger.error(`updateUser proxy error: ${err.message}`);
@@ -63,7 +63,7 @@ export const UserManagementController = {
   async blockUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const response = await userDriverClient.patch(`/users/block/${id}`);
+      const response = await userDriverClient.patch(`/api/users/block/${id}`);
       return res.status(response.status).json(response.data);
     } catch (err: any) {
       logger.error(`blockUser proxy error: ${err.message}`);
@@ -74,7 +74,7 @@ export const UserManagementController = {
   async unblockUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const response = await userDriverClient.patch(`/users/unblock/${id}`);
+      const response = await userDriverClient.patch(`/api/users/unblock/${id}`);
       return res.status(response.status).json(response.data);
     } catch (err: any) {
       logger.error(`unblockUser proxy error: ${err.message}`);
@@ -85,7 +85,7 @@ export const UserManagementController = {
   async disableUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const response = await userDriverClient.patch(`/users/disable/${id}`);
+      const response = await userDriverClient.patch(`/api/users/disable/${id}`);
       return res.status(response.status).json(response.data);
     } catch (err: any) {
       logger.error(`disableUser proxy error: ${err.message}`);
@@ -96,7 +96,7 @@ export const UserManagementController = {
   async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const response = await userDriverClient.delete(`/users/delete/${id}`);
+      const response = await userDriverClient.delete(`/api/users/delete/${id}`);
       return res.status(response.status).json(response.data);
     } catch (err: any) {
       logger.error(`deleteUser proxy error: ${err.message}`);

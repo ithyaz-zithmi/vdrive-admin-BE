@@ -8,6 +8,7 @@ import locationRoutes from '../modules/locations/location.routes';
 import hotspotRoutes from '../modules/hotspots/hotspot.routes';
 import priceSettingsRoutes from '../modules/price-settings/price.routes';
 import packageRoutes from '../modules/packages/package.routes';
+import s3Routes from '../modules/s3/s3.routes';
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use('/price-settings', priceSettingsRoutes);
 router.use('/packages', packageRoutes);
 router.use('/admin-users', userRoutes);
 router.use('/users', userManagementRoutes);
+router.use('/generate-presigned-url', s3Routes);
 
 export default router;

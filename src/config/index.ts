@@ -23,6 +23,7 @@ interface Config {
   };
   prodURL: string;
   userDriverApiUrl: string;
+  awsServiceUrl: string;
   internalServiceApiKey: string;
   email: {
     service: string;
@@ -52,6 +53,7 @@ const config: Config = {
   },
   prodURL: process.env.PROD_URL || 'http://localhost:3000',
   userDriverApiUrl: process.env.USER_DRIVER_API_URL || 'http://localhost:3001',
+  awsServiceUrl: process.env.AWS_SERVICE_URL || 'http://localhost:1235',
   internalServiceApiKey: process.env.INTERNAL_SERVICE_API_KEY || '',
   email: {
     service: process.env.EMAIL_SERVICE || 'gmail',
