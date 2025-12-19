@@ -1,25 +1,27 @@
 import axios from 'axios';
 import { logger } from './logger';
+import config from '../config';
 
 export const forwardRequest = async (req: any, res: any, next: any, url: string) => {
   try {
     const { body: data } = req;
-    const config = {
+    const axiosConfig = {
       method: req.method,
       url: `${url}${req.originalUrl}`,
       headers: {
         'Content-Type': 'application/json',
+        'x-api-key': config.internalServiceApiKey,
       },
       data,
     };
     logger.info(`Forwarding Request to URL :${url}  tenant  :${req.tenant} `);
 
-    const response = await axios(config);
+    const response = await axios(axiosConfig);
     logger.info(`Request Processed Successfully :${url}  tenant  :${req.tenant} `);
 
     return res.status(response.status).json(response.data);
   } catch (error: any) {
-    logger.error(`Error In  URL: ${url}  tenant  :${req.tenant} `);
+    logger.error(`Error In  URL: ${url} `);
     let responseData = {
       data: {
         message:
