@@ -16,7 +16,7 @@ router.get('/health-check', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Server is healthy' });
 });
 router.use('/auth', authRoutes);
-router.use(isAuthenticated);
+// router.use(isAuthenticated);
 router.use('/locations', locationRoutes);
 router.use('/hotspots', hotspotRoutes);
 router.use('/price-settings', priceSettingsRoutes);
