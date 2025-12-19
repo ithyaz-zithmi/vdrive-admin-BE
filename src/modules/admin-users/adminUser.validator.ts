@@ -13,12 +13,14 @@ export const AdminUserValidation = {
       'string.min': 'Password must be at least 6 characters long',
       'any.required': 'Password is required',
     }),
-    contact: Joi.string()
-      .pattern(/^\+?[1-9]\d{1,14}$/)
+    contact: Joi.alternatives()
+      .try(
+        Joi.string().email(),
+        Joi.string().pattern(/^[0-9]{6,15}$/) // phone: 6–15 digits
+      )
       .required()
       .messages({
-        'string.pattern.base': 'Contact must be a valid phone number',
-        'any.required': 'Contact is required',
+        'alternatives.match': 'Contact must be a valid email or phone number.',
       }),
     alternate_contact: Joi.string()
       .pattern(/^\+?[1-9]\d{1,14}$/)
