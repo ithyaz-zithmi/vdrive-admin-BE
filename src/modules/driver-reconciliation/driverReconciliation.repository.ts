@@ -1,0 +1,234 @@
+// src/modules/driver-reconciliation/driverReconciliation.repository.ts
+import { query } from '../../shared/database';
+import {
+  DriverReconciliationUpload,
+  DriverReconciliationRow,
+  DriverReconciliationPayload,
+  MatchResult,
+} from './driverReconciliation.model';
+
+export class DriverReconciliationRepository {
+  // Create a new upload record
+  static async createUpload(
+    adminId: string | undefined,
+    filename: string,
+    totalRows: number
+  ): Promise<number> {
+    const result = await query(
+      `INSERT INTO driver_reconciliation_uploads (admin_id, filename, total_rows, status)
+       VALUES ($1, $2, $3, 'pending')
+       RETURNING id`,
+      [adminId, filename, totalRows]
+    );
+    return result.rows[0].id;
+  }
+
+  // Update upload status and processed rows
+  static async updateUploadStatus(
+    uploadId: number,
+    status: string,
+    processedRows?: number
+  ): Promise<void> {
+    const queryText =
+      processedRows !== undefined
+        ? `UPDATE driver_reconciliation_uploads SET status = $2, processed_rows = $3, updated_at = NOW() WHERE id = $1`
+        : `UPDATE driver_reconciliation_uploads SET status = $2, updated_at = NOW() WHERE id = $1`;
+
+    const params =
+      processedRows !== undefined ? [uploadId, status, processedRows] : [uploadId, status];
+
+    await query(queryText, params);
+  }
+
+  // Insert multiple reconciliation rows
+  static async insertReconciliationRows(rows: Partial<DriverReconciliationRow>[]): Promise<void> {
+    if (rows.length === 0) return;
+
+    const values = rows
+      .map(
+        (row) => `(
+      ${row.upload_id},
+      ${row.driver_name ? `'${row.driver_name.replace(/'/g, "''")}'` : 'NULL'},
+      ${row.phone ? `'${row.phone}'` : 'NULL'},
+      ${row.mail ? `'${row.mail}'` : 'NULL'},
+      ${row.pincode ? `'${row.pincode}'` : 'NULL'},
+      ${row.dob ? `'${row.dob.toISOString()}'` : 'NULL'},
+      ${row.area ? `'${row.area.replace(/'/g, "''")}'` : 'NULL'},
+      ${row.street ? `'${row.street.replace(/'/g, "''")}'` : 'NULL'},
+      ${row.district ? `'${row.district.replace(/'/g, "''")}'` : 'NULL'},
+      ${row.state ? `'${row.state.replace(/'/g, "''")}'` : 'NULL'},
+      ${row.country ? `'${row.country.replace(/'/g, "''")}'` : 'NULL'},
+      ${row.has_account || false},
+      ${row.is_onboarded || false},
+      ${row.match_confidence || 0},
+      ${row.error_message ? `'${row.error_message.replace(/'/g, "''")}'` : 'NULL'},
+      ${row.whatsapp_sent || false}
+    )`
+      )
+      .join(', ');
+
+    await query(`
+      INSERT INTO driver_reconciliation_rows (
+        upload_id, driver_name, phone, mail, pincode, dob, area, street,
+        district, state, country, has_account, is_onboarded, match_confidence,
+        error_message, whatsapp_sent
+      ) VALUES ${values}
+    `);
+  }
+
+  // Check if driver exists by phone or email
+  static async findExistingDriver(phone?: string, email?: string): Promise<MatchResult> {
+    let queryText = '';
+    let params: any[] = [];
+    let matchConfidence = 0;
+
+    if (phone && email) {
+      // Check for both phone and email match
+      queryText = `
+        SELECT u.id as user_id, dp.driver_id,
+               CASE WHEN dp.driver_id IS NOT NULL THEN true ELSE false END as is_onboarded
+        FROM users u
+        LEFT JOIN driver_profiles dp ON u.id = dp.driver_id
+        WHERE u.role = 'driver'
+        AND (u.phone_number = $1 OR u.contact = $1)
+        AND u.email = $2
+        AND u.is_deleted = false
+      `;
+      params = [phone, email];
+      matchConfidence = 3; // Both phone and email match
+    } else if (phone) {
+      // Check for phone match only
+      queryText = `
+        SELECT u.id as user_id, dp.driver_id,
+               CASE WHEN dp.driver_id IS NOT NULL THEN true ELSE false END as is_onboarded
+        FROM users u
+        LEFT JOIN driver_profiles dp ON u.id = dp.driver_id
+        WHERE u.role = 'driver'
+        AND (u.phone_number = $1 OR u.contact = $1)
+        AND u.is_deleted = false
+      `;
+      params = [phone];
+      matchConfidence = 1; // Phone match only
+    } else if (email) {
+      // Check for email match only
+      queryText = `
+        SELECT u.id as user_id, dp.driver_id,
+               CASE WHEN dp.driver_id IS NOT NULL THEN true ELSE false END as is_onboarded
+        FROM users u
+        LEFT JOIN driver_profiles dp ON u.id = dp.driver_id
+        WHERE u.role = 'driver'
+        AND u.email = $1
+        AND u.is_deleted = false
+      `;
+      params = [email];
+      matchConfidence = 2; // Email match only
+    } else {
+      return { has_account: false, is_onboarded: false, match_confidence: 0 };
+    }
+
+    const result = await query(queryText, params);
+
+    if (result.rows.length > 0) {
+      const row = result.rows[0];
+      return {
+        has_account: true,
+        is_onboarded: row.is_onboarded,
+        match_confidence: matchConfidence,
+        existing_user_id: row.user_id,
+        existing_driver_id: row.driver_id,
+      };
+    }
+
+    return { has_account: false, is_onboarded: false, match_confidence: 0 };
+  }
+
+  // Get upload by ID
+  static async getUploadById(uploadId: number): Promise<DriverReconciliationUpload | null> {
+    const result = await query('SELECT * FROM driver_reconciliation_uploads WHERE id = $1', [
+      uploadId,
+    ]);
+    return result.rows.length > 0 ? result.rows[0] : null;
+  }
+
+  // Get reconciliation rows by upload ID
+  static async getRowsByUploadId(
+    uploadId: number,
+    limit?: number,
+    offset?: number
+  ): Promise<DriverReconciliationRow[]> {
+    let queryText = 'SELECT * FROM driver_reconciliation_rows WHERE upload_id = $1 ORDER BY id';
+    const params: any[] = [uploadId];
+
+    if (limit) {
+      queryText += ' LIMIT $2';
+      params.push(limit);
+    }
+
+    if (offset) {
+      queryText += ' OFFSET $' + (params.length + 1);
+      params.push(offset);
+    }
+
+    const result = await query(queryText, params);
+    return result.rows;
+  }
+
+  // Get upload statistics
+  static async getUploadStats(uploadId: number): Promise<{
+    total_rows: number;
+    processed_rows: number;
+    matched_rows: number;
+    onboarded_rows: number;
+    error_rows: number;
+  }> {
+    const result = await query(
+      `
+      SELECT
+        COUNT(*) as total_rows,
+        COUNT(CASE WHEN has_account = true THEN 1 END) as matched_rows,
+        COUNT(CASE WHEN is_onboarded = true THEN 1 END) as onboarded_rows,
+        COUNT(CASE WHEN error_message IS NOT NULL THEN 1 END) as error_rows
+      FROM driver_reconciliation_rows
+      WHERE upload_id = $1
+    `,
+      [uploadId]
+    );
+
+    const stats = result.rows[0];
+    const processedRows = await query(
+      'SELECT processed_rows FROM driver_reconciliation_uploads WHERE id = $1',
+      [uploadId]
+    );
+
+    return {
+      total_rows: parseInt(stats.total_rows),
+      processed_rows: processedRows.rows[0]?.processed_rows || 0,
+      matched_rows: parseInt(stats.matched_rows),
+      onboarded_rows: parseInt(stats.onboarded_rows),
+      error_rows: parseInt(stats.error_rows),
+    };
+  }
+
+  // Update WhatsApp sent status
+  static async updateWhatsAppSent(rowIds: number[]): Promise<void> {
+    if (rowIds.length === 0) return;
+
+    const placeholders = rowIds.map((_, index) => `$${index + 1}`).join(',');
+    await query(
+      `UPDATE driver_reconciliation_rows SET whatsapp_sent = true WHERE id IN (${placeholders})`,
+      rowIds
+    );
+  }
+
+  // Get all uploads with pagination
+  static async getUploads(
+    limit: number = 50,
+    offset: number = 0
+  ): Promise<DriverReconciliationUpload[]> {
+    const result = await query(
+      'SELECT * FROM driver_reconciliation_uploads ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+      [limit, offset]
+    );
+    return result.rows;
+  }
+}

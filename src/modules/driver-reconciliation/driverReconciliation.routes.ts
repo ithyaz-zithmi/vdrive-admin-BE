@@ -1,0 +1,29 @@
+// src/modules/driver-reconciliation/driverReconciliation.routes.ts
+import { Router } from 'express';
+import { DriverReconciliationController } from './driverReconciliation.controller';
+import isAuthenticated from '../../shared/authentication';
+
+const router = Router();
+
+// Apply authentication middleware to all routes
+router.use(isAuthenticated);
+
+// POST /api/driver-reconciliation/process - Process reconciliation data
+router.post('/process', DriverReconciliationController.processReconciliationData);
+
+// GET /api/driver-reconciliation/uploads - Get all uploads with pagination
+router.get('/uploads', DriverReconciliationController.getUploads);
+
+// GET /api/driver-reconciliation/uploads/:uploadId - Get upload details
+router.get('/uploads/:uploadId', DriverReconciliationController.getUploadDetails);
+
+// GET /api/driver-reconciliation/uploads/:uploadId/rows - Get reconciliation rows
+router.get('/uploads/:uploadId/rows', DriverReconciliationController.getReconciliationRows);
+
+// POST /api/driver-reconciliation/whatsapp-campaign - Update WhatsApp campaign status
+router.post('/whatsapp-campaign', DriverReconciliationController.updateWhatsAppCampaign);
+
+// GET /api/driver-reconciliation/summary - Get reconciliation summary statistics
+router.get('/summary', DriverReconciliationController.getReconciliationSummary);
+
+export default router;
