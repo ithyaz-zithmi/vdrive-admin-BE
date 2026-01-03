@@ -81,6 +81,7 @@ export const up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 export const down = (pgm) => {
+//drop table
  pgm.dropTable('recharge_plans', { ifExists: true });
  pgm.dropType('rechargePlan_type_enum', { ifExists: true });
 
