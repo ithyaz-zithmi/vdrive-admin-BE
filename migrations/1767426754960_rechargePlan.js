@@ -10,11 +10,11 @@ export const shorthands = undefined;
  */
 
 export const up = (pgm) => {
-  // Create rechargePlan_type_enum
+  // Create recharge_plan
   pgm.sql(`
     DO $$ 
     BEGIN
-      CREATE TYPE rechargePlan_type_enum AS ENUM ('DAILY', 'OUTSTATION', 'ONROAD');
+      CREATE TYPE recharge_plan AS ENUM ('DAILY', 'OUTSTATION', 'ONROAD');
     EXCEPTION
       WHEN duplicate_object THEN NULL;
     END $$;
@@ -39,7 +39,7 @@ export const up = (pgm) => {
       },
 
       plan_type: {
-        type: 'rechargePlan_type_enum', 
+        type: 'recharge_plan', 
         notNull: true,
         default: "'DAILY'",
       },
@@ -83,7 +83,7 @@ export const up = (pgm) => {
 export const down = (pgm) => {
 //drop table
  pgm.dropTable('recharge_plans', { ifExists: true });
- pgm.dropType('rechargePlan_type_enum', { ifExists: true });
+ pgm.dropType('recharge_plan', { ifExists: true });
 
 };
 
