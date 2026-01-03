@@ -39,9 +39,9 @@ export const up = (pgm) => {
       },
 
       plan_type: {
-        type: 'recharge_plan_type_enum', 
+        type: 'recharge_plan_type_enum',
         notNull: true,
-        default: "'DAILY'",
+        default: 'DAILY',
       },
 
       ride_limit: {
@@ -81,10 +81,7 @@ export const up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 export const down = (pgm) => {
-//drop table
- pgm.dropTable('recharge_plans', { ifExists: true });
- pgm.dropType('recharge_plan_type_enum', { ifExists: true });
-
+  //drop table
+  pgm.dropTable('recharge_plans', { ifExists: true });
+  pgm.dropType('recharge_plan_type_enum', { ifExists: true });
 };
-
-
