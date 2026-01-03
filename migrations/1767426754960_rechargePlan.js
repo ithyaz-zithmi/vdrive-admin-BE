@@ -10,7 +10,7 @@ export const shorthands = undefined;
  */
 
 export const up = (pgm) => {
-  // 1️⃣ Create rechargePlan_type_enum
+  // Create rechargePlan_type_enum
   pgm.sql(`
     DO $$ 
     BEGIN
@@ -20,7 +20,7 @@ export const up = (pgm) => {
     END $$;
   `);
 
-  // 2️⃣ Create recharge_plans table
+  //  Create recharge_plans table
   pgm.createTable(
     'recharge_plans',
     {
