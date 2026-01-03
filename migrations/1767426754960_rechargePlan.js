@@ -1,0 +1,89 @@
+/**
+ * @type {import('node-pg-migrate').ColumnDefinitions | undefined}
+ */
+export const shorthands = undefined;
+
+/**
+ * @param pgm {import('node-pg-migrate').MigrationBuilder}
+ * @param run {() => void | undefined}
+ * @returns {Promise<void> | void}
+ */
+
+export const up = (pgm) => {
+  // 1️⃣ Create rechargePlan_type_enum
+  pgm.sql(`
+    DO $$ 
+    BEGIN
+      CREATE TYPE rechargePlan_type_enum AS ENUM ('DAILY', 'OUTSTATION', 'ONROAD');
+    EXCEPTION
+      WHEN duplicate_object THEN NULL;
+    END $$;
+  `);
+
+  // 2️⃣ Create recharge_plans table
+  pgm.createTable(
+    'recharge_plans',
+    {
+      id: {
+        type: 'serial',
+        primaryKey: true,
+      },
+
+      plan_name: {
+        type: 'varchar(100)',
+        notNull: true,
+      },
+
+      description: {
+        type: 'text',
+      },
+
+      plan_type: {
+        type: 'rechargePlan_type_enum', 
+        notNull: true,
+        default: "'DAILY'",
+      },
+
+      ride_limit: {
+        type: 'int',
+        notNull: true,
+      },
+
+      validity_days: {
+        type: 'int',
+        notNull: true,
+      },
+
+      price: {
+        type: 'numeric(10,2)',
+        notNull: true,
+      },
+
+      is_active: {
+        type: 'boolean',
+        notNull: true,
+        default: true,
+      },
+
+      created_at: {
+        type: 'timestamp',
+        notNull: true,
+        default: pgm.func('CURRENT_TIMESTAMP'),
+      },
+    },
+    { ifNotExists: true }
+  );
+};
+
+/**
+ * @param pgm {import('node-pg-migrate').MigrationBuilder}
+ * @param run {() => void | undefined}
+ * @returns {Promise<void> | void}
+ */
+export const down = (pgm) => {
+ pgm.dropTable('recharge_plans', { ifExists: true });
+ pgm.dropType('rechargePlan_type_enum', { ifExists: true });
+
+};
+
+
