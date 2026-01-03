@@ -3,7 +3,6 @@ node_modules/
 
 # Build / compiled files
 dist/
-*.js
 *.js.map
 
 
