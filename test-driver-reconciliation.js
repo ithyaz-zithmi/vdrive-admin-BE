@@ -1,7 +1,7 @@
 // Test script for Driver Reconciliation Module
 const axios = require('axios');
 
-const BASE_URL = 'http://localhost:3000'; // zithmi-app server
+const BASE_URL = 'http://localhost:1234'; // vdrive-admin-BE server
 const JWT_TOKEN = 'your-admin-jwt-token-here'; // Replace with actual admin JWT token
 
 async function testDriverReconciliation() {
@@ -153,6 +153,36 @@ async function testDriverReconciliation() {
         });
       });
       console.log('');
+
+      // Test 3.5: Get all reconciliation rows (without upload ID filter)
+      console.log('📋 Getting all reconciliation rows (no upload ID filter)...');
+      const allRowsResponse = await axios.get(
+        `${BASE_URL}/api/driver-reconciliation/rows?page=1&limit=10`,
+        {
+          headers: {
+            Authorization: `Bearer ${JWT_TOKEN}`,
+          },
+        }
+      );
+
+      console.log('✅ All Reconciliation Rows:', {
+        count: allRowsResponse.data.data.rows.length,
+        pagination: allRowsResponse.data.data.pagination,
+      });
+
+      // Show sample rows
+      allRowsResponse.data.data.rows.slice(0, 2).forEach((row, index) => {
+        console.log(`   Row ${index + 1}:`, {
+          driver_name: row.driver_name,
+          phone: row.phone,
+          mail: row.mail,
+          has_account: row.has_account,
+          is_onboarded: row.is_onboarded,
+          match_confidence: row.match_confidence,
+          upload_id: row.upload_id,
+        });
+      });
+      console.log('');
     }
 
     // Test 4: Get all uploads
@@ -246,6 +276,7 @@ function showAPIEndpoints() {
   console.log('GET    /api/driver-reconciliation/uploads           - Get all uploads (paginated)');
   console.log('GET    /api/driver-reconciliation/uploads/:id       - Get upload details');
   console.log('GET    /api/driver-reconciliation/uploads/:id/rows  - Get reconciliation rows');
+  console.log('GET    /api/driver-reconciliation/rows              - Get all reconciliation rows');
   console.log(
     'POST   /api/driver-reconciliation/whatsapp-campaign - Update WhatsApp campaign status'
   );
