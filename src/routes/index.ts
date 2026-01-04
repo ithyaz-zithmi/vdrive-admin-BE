@@ -2,6 +2,7 @@
 import { Router } from 'express';
 import userRoutes from '../modules/admin-users/adminUser.routes';
 import userManagementRoutes from '../modules/user-management/userManagement.routes';
+import tripManagementRoutes from '../modules/trip-management/tripManagement.routes';
 import authRoutes from '../modules/auth/auth.routes';
 import isAuthenticated from '../shared/authentication';
 import locationRoutes from '../modules/locations/location.routes';
@@ -27,6 +28,7 @@ router.use('/price-settings', priceSettingsRoutes);
 router.use('/packages', packageRoutes);
 router.use('/admin-users', userRoutes);
 router.use('/users', userManagementRoutes);
+router.use('/trips', tripManagementRoutes);
 router.use('/generate-presigned-url', s3Routes);
 router.use('/driver-reconciliation', driverReconciliationRoutes);
 router.use('/recharge-plans', rechargePlanRoutes);

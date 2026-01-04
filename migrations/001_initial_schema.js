@@ -32,12 +32,6 @@ export const up = (pgm) => {
   END $$;`);
 
   pgm.sql(`DO $$ BEGIN
-    CREATE TYPE user_role AS ENUM ('customer', 'driver', 'admin');
-  EXCEPTION
-    WHEN duplicate_object THEN null;
-  END $$;`);
-
-  pgm.sql(`DO $$ BEGIN
     CREATE TYPE gender_enum AS ENUM ('male', 'female', 'other');
   EXCEPTION
     WHEN duplicate_object THEN null;
@@ -60,7 +54,7 @@ export const up = (pgm) => {
       password: { type: 'text', notNull: true },
       contact: { type: 'text', unique: true, notNull: true },
       alternate_contact: { type: 'varchar(15)' },
-      role: { type: 'varchar(20)', notNull: true, default: "'admin'", check: "role = 'admin'" },
+      role: { type: 'varchar(20)', notNull: true, default: 'admin' },
       reset_token: { type: 'text' },
       reset_token_expiry: { type: 'timestamp with time zone' },
       created_at: {
@@ -479,7 +473,6 @@ export const down = (pgm) => {
   // Drop types (in reverse order)
   pgm.dropType('user_status_enum', { ifExists: true });
   pgm.dropType('gender_enum', { ifExists: true });
-  pgm.dropType('user_role', { ifExists: true });
   pgm.dropType('week_day', { ifExists: true });
   pgm.dropType('time_type', { ifExists: true });
   pgm.dropType('driver_type', { ifExists: true });
