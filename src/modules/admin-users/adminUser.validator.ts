@@ -2,11 +2,17 @@ import { Joi } from 'celebrate';
 
 export const AdminUserValidation = {
   createAdminUserValidation: Joi.object().keys({
-    name: Joi.string().min(2).max(100).required().messages({
-      'string.empty': 'Name is required',
-      'string.min': 'Name must be at least 2 characters long',
-      'string.max': 'Name must not exceed 100 characters',
-      'any.required': 'Name is required',
+    first_name: Joi.string().min(2).max(100).required().messages({
+      'string.empty': 'First name is required',
+      'string.min': 'First name must be at least 2 characters long',
+      'string.max': 'First name must not exceed 100 characters',
+      'any.required': 'First name is required',
+    }),
+    last_name: Joi.string().min(2).max(100).required().messages({
+      'string.empty': 'Last name is required',
+      'string.min': 'Last name must be at least 2 characters long',
+      'string.max': 'Last name must not exceed 100 characters',
+      'any.required': 'Last name is required',
     }),
     password: Joi.string().min(6).required().messages({
       'string.empty': 'Password is required',
@@ -31,9 +37,13 @@ export const AdminUserValidation = {
   }),
 
   updateAdminUserValidation: Joi.object({
-    name: Joi.string().min(2).max(100).optional().messages({
-      'string.min': 'Name must be at least 2 characters long',
-      'string.max': 'Name must not exceed 100 characters',
+    first_name: Joi.string().min(2).max(100).optional().messages({
+      'string.min': 'First name must be at least 2 characters long',
+      'string.max': 'First name must not exceed 100 characters',
+    }),
+    last_name: Joi.string().min(2).max(100).optional().messages({
+      'string.min': 'Last name must be at least 2 characters long',
+      'string.max': 'Last name must not exceed 100 characters',
     }),
     contact: Joi.string()
       .pattern(/^\+?[1-9]\d{1,14}$/)

@@ -3,11 +3,7 @@ import { forwardRequest } from '../../shared/forwardRequest';
 import config from '../../config';
 
 export const UserManagementController = {
-  async getCustomers(req: Request, res: Response, next: NextFunction) {
-    return forwardRequest(req, res, next, config.userDriverApiUrl);
-  },
-
-  async getDrivers(req: Request, res: Response, next: NextFunction) {
+  async getUsers(req: Request, res: Response, next: NextFunction) {
     return forwardRequest(req, res, next, config.userDriverApiUrl);
   },
 
@@ -36,6 +32,14 @@ export const UserManagementController = {
   },
 
   async deleteUser(req: Request, res: Response, next: NextFunction) {
+    return forwardRequest(req, res, next, config.userDriverApiUrl);
+  },
+
+  async enableUser(req: Request, res: Response, next: NextFunction) {
+    return forwardRequest(req, res, next, config.userDriverApiUrl);
+  },
+
+  async searchUsers(req: Request, res: Response, next: NextFunction) {
     return forwardRequest(req, res, next, config.userDriverApiUrl);
   },
 };

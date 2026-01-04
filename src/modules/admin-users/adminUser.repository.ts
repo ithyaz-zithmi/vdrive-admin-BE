@@ -18,15 +18,25 @@ export const AdminUserRepository = {
   },
 
   async create(data: {
-    name: string;
+    first_name: string;
+    last_name: string;
+    full_name: string;
     password: string;
     contact: string;
     alternate_contact?: string;
     role: 'admin';
   }): Promise<AdminUser> {
     const result = await query(
-      'INSERT INTO admin_users (name, password, contact, alternate_contact, role, is_deleted) VALUES ($1, $2, $3, $4, $5, false) RETURNING *',
-      [data.name, data.password, data.contact, data.alternate_contact || null, data.role]
+      'INSERT INTO admin_users (first_name, last_name, full_name, password, contact, alternate_contact, role, is_deleted) VALUES ($1, $2, $3, $4, $5, $6, $7, false) RETURNING *',
+      [
+        data.first_name,
+        data.last_name,
+        data.full_name,
+        data.password,
+        data.contact,
+        data.alternate_contact || null,
+        data.role,
+      ]
     );
     return result.rows[0];
   },
@@ -34,7 +44,9 @@ export const AdminUserRepository = {
   async update(
     id: string,
     data: Partial<{
-      name: string;
+      first_name: string;
+      last_name: string;
+      full_name: string;
       contact: string;
       alternate_contact?: string;
     }>
@@ -43,9 +55,19 @@ export const AdminUserRepository = {
     const values = [];
     let index = 1;
 
-    if (data.name !== undefined) {
-      fields.push(`name = $${index}`);
-      values.push(data.name);
+    if (data.first_name !== undefined) {
+      fields.push(`first_name = $${index}`);
+      values.push(data.first_name);
+      index++;
+    }
+    if (data.last_name !== undefined) {
+      fields.push(`last_name = $${index}`);
+      values.push(data.last_name);
+      index++;
+    }
+    if (data.full_name !== undefined) {
+      fields.push(`full_name = $${index}`);
+      values.push(data.full_name);
       index++;
     }
     if (data.contact !== undefined) {
