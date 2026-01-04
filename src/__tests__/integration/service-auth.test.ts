@@ -69,7 +69,7 @@ describe('Service Authentication Integration', () => {
       // Test direct HTTP call without API key
       const axios = require('axios');
       try {
-        await axios.patch(`http://localhost:3001/users/block/${testUserId}`);
+        await axios.patch(`http://localhost:3002/users/block/${testUserId}`);
         expect(true).toBe(false); // Should not reach here
       } catch (error: any) {
         if (error.response) {
@@ -86,7 +86,7 @@ describe('Service Authentication Integration', () => {
       const axios = require('axios');
       try {
         await axios.patch(
-          `http://localhost:3001/users/block/${testUserId}`,
+          `http://localhost:3002/users/block/${testUserId}`,
           {},
           {
             headers: { 'x-api-key': 'invalid-key' },

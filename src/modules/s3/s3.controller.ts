@@ -2,14 +2,16 @@ import { Request, Response, NextFunction } from 'express';
 import config from '../../config';
 import { logger } from '../../shared/logger';
 import axios from 'axios';
+import https from 'https';
 import { successResponse } from '../../shared/errorHandler';
+
 
 export const S3Controller = {
   async generateUploadUrl(req: Request, res: Response, next: NextFunction): Promise<void> {
     const url = `${config.awsServiceUrl}/api/s3/generate-upload-url`;
 
     try {
-      const axiosConfig = {
+      const axiosConfig: any = {
         method: 'POST', // explicit is safer
         url,
         headers: {
@@ -17,6 +19,9 @@ export const S3Controller = {
           Authorization: req.headers.authorization,
         },
         data: req.body,
+          httpsAgent: new https.Agent({
+          rejectUnauthorized: false,
+        }),
         timeout: 10_000,
       };
 
