@@ -85,40 +85,37 @@ export class DriverReconciliationRepository {
     if (phone && email) {
       // Check for both phone and email match
       queryText = `
-        SELECT u.id as user_id, dp.driver_id,
+        SELECT d.id as driver_id,
                CASE WHEN dp.driver_id IS NOT NULL THEN true ELSE false END as is_onboarded
-        FROM users u
-        LEFT JOIN driver_profiles dp ON u.id = dp.driver_id
-        WHERE u.role = 'driver'
-        AND (u.phone_number = $1 OR u.contact = $1)
-        AND u.email = $2
-        AND u.is_deleted = false
+        FROM drivers d
+        LEFT JOIN driver_profiles dp ON d.id = dp.driver_id
+        WHERE d.phone_number = $1
+        AND d.email = $2
+        AND d.is_deleted = false
       `;
       params = [phone, email];
       matchConfidence = 3; // Both phone and email match
     } else if (phone) {
       // Check for phone match only
       queryText = `
-        SELECT u.id as user_id, dp.driver_id,
+        SELECT d.id as driver_id,
                CASE WHEN dp.driver_id IS NOT NULL THEN true ELSE false END as is_onboarded
-        FROM users u
-        LEFT JOIN driver_profiles dp ON u.id = dp.driver_id
-        WHERE u.role = 'driver'
-        AND (u.phone_number = $1 OR u.contact = $1)
-        AND u.is_deleted = false
+        FROM drivers d
+        LEFT JOIN driver_profiles dp ON d.id = dp.driver_id
+        WHERE d.phone_number = $1
+        AND d.is_deleted = false
       `;
       params = [phone];
       matchConfidence = 1; // Phone match only
     } else if (email) {
       // Check for email match only
       queryText = `
-        SELECT u.id as user_id, dp.driver_id,
+        SELECT d.id as driver_id,
                CASE WHEN dp.driver_id IS NOT NULL THEN true ELSE false END as is_onboarded
-        FROM users u
-        LEFT JOIN driver_profiles dp ON u.id = dp.driver_id
-        WHERE u.role = 'driver'
-        AND u.email = $1
-        AND u.is_deleted = false
+        FROM drivers d
+        LEFT JOIN driver_profiles dp ON d.id = dp.driver_id
+        WHERE d.email = $1
+        AND d.is_deleted = false
       `;
       params = [email];
       matchConfidence = 2; // Email match only
@@ -134,7 +131,7 @@ export class DriverReconciliationRepository {
         has_account: true,
         is_onboarded: row.is_onboarded,
         match_confidence: matchConfidence,
-        existing_user_id: row.user_id,
+        existing_user_id: row.driver_id, // Use driver_id as user_id for backward compatibility
         existing_driver_id: row.driver_id,
       };
     }
