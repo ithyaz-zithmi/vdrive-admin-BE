@@ -20,6 +20,9 @@ router.get('/uploads/:uploadId', DriverReconciliationController.getUploadDetails
 // GET /api/driver-reconciliation/uploads/:uploadId/rows - Get reconciliation rows
 router.get('/uploads/:uploadId/rows', DriverReconciliationController.getReconciliationRows);
 
+// GET /api/driver-reconciliation/rows - Get all reconciliation rows
+router.get('/rows', DriverReconciliationController.getAllReconciliationRows);
+
 // POST /api/driver-reconciliation/whatsapp-campaign - Update WhatsApp campaign status
 router.post('/whatsapp-campaign', DriverReconciliationController.updateWhatsAppCampaign);
 

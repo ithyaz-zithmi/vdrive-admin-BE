@@ -205,6 +205,25 @@ export class DriverReconciliationService {
     }
   }
 
+  // Get all reconciliation rows without upload ID filter
+  static async getAllReconciliationRows(page: number = 1, limit: number = 50) {
+    try {
+      const offset = (page - 1) * limit;
+      const rows = await DriverReconciliationRepository.getAllReconciliationRows(limit, offset);
+
+      return {
+        rows,
+        pagination: {
+          page,
+          limit,
+          offset,
+        },
+      };
+    } catch (error: any) {
+      throw new Error(`Failed to get all reconciliation rows: ${error.message}`);
+    }
+  }
+
   // Get all uploads with pagination
   static async getUploads(page: number = 1, limit: number = 50) {
     try {

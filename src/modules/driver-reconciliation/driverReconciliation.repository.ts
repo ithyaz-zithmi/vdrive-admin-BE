@@ -170,6 +170,28 @@ export class DriverReconciliationRepository {
     return result.rows;
   }
 
+  // Get all reconciliation rows without upload ID filter
+  static async getAllReconciliationRows(
+    limit?: number,
+    offset?: number
+  ): Promise<DriverReconciliationRow[]> {
+    let queryText = 'SELECT * FROM driver_reconciliation_rows ORDER BY id';
+    const params: any[] = [];
+
+    if (limit) {
+      queryText += ' LIMIT $1';
+      params.push(limit);
+    }
+
+    if (offset) {
+      queryText += ' OFFSET $' + (params.length + 1);
+      params.push(offset);
+    }
+
+    const result = await query(queryText, params);
+    return result.rows;
+  }
+
   // Get upload statistics
   static async getUploadStats(uploadId: number): Promise<{
     total_rows: number;

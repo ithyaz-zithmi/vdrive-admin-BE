@@ -117,6 +117,34 @@ export class DriverReconciliationController {
     }
   }
 
+  // Get all reconciliation rows without upload ID filter
+  static async getAllReconciliationRows(req: Request, res: Response, next: NextFunction) {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 50;
+
+      if (page < 1 || limit < 1 || limit > 1000) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid pagination parameters',
+        });
+      }
+
+      const result = await DriverReconciliationService.getAllReconciliationRows(page, limit);
+
+      return res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (error: any) {
+      console.error('Error in getAllReconciliationRows:', error);
+      return res.status(500).json({
+        success: false,
+        message: error.message || 'Internal server error',
+      });
+    }
+  }
+
   // Get all uploads
   static async getUploads(req: Request, res: Response, next: NextFunction) {
     try {
