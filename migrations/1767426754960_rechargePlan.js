@@ -14,7 +14,7 @@ export const up = (pgm) => {
   pgm.sql(`
     DO $$ 
     BEGIN
-      CREATE TYPE recharge_plan_type_enum AS ENUM ('DAILY', 'OUTSTATION', 'ONROAD');
+      CREATE TYPE recharge_plan_type_enum AS ENUM ('ONE-WAY','ROUND-TRIP','OUT-STATION','SCHEDULE');
     EXCEPTION
       WHEN duplicate_object THEN NULL;
     END $$;
@@ -41,7 +41,7 @@ export const up = (pgm) => {
       plan_type: {
         type: 'recharge_plan_type_enum', 
         notNull: true,
-        default: "'DAILY'",
+        default: "'ONE-WAY'",
       },
 
       ride_limit: {
