@@ -9,6 +9,7 @@ import hotspotRoutes from '../modules/hotspots/hotspot.routes';
 import priceSettingsRoutes from '../modules/price-settings/price.routes';
 import packageRoutes from '../modules/packages/package.routes';
 import s3Routes from '../modules/s3/s3.routes';
+import deductionRoutes from '../modules/deductions/deduction.routes';
 import driverReconciliationRoutes from '../modules/driver-reconciliation/driverReconciliation.routes';
 
 const router = Router();
@@ -24,6 +25,7 @@ router.use('/price-settings', priceSettingsRoutes);
 router.use('/packages', packageRoutes);
 router.use('/admin-users', userRoutes);
 router.use('/users', userManagementRoutes);
+router.use('/deductions', deductionRoutes);
 router.use('/generate-presigned-url', s3Routes);
 router.use('/driver-reconciliation', driverReconciliationRoutes);
 
