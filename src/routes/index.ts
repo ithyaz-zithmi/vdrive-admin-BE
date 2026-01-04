@@ -21,7 +21,6 @@ router.use('/auth', authRoutes);
 
 router.use(isAuthenticated);
 
-
 router.use('/locations', locationRoutes);
 router.use('/hotspots', hotspotRoutes);
 router.use('/price-settings', priceSettingsRoutes);
@@ -30,6 +29,6 @@ router.use('/admin-users', userRoutes);
 router.use('/users', userManagementRoutes);
 router.use('/generate-presigned-url', s3Routes);
 router.use('/driver-reconciliation', driverReconciliationRoutes);
-router.use('/recharge-plans', rechargePlanRoutes); 
+router.use('/recharge-plans', rechargePlanRoutes);
 
 export default router;
