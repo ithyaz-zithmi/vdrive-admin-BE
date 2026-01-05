@@ -1,5 +1,29 @@
 import { query } from '../../shared/database';
 
+
+
+// 🔹 CREATE DTO
+export interface CreateRechargePlanDTO {
+  planName: string;
+  planType: string[];          
+  description?: string;
+  rideLimit: number;
+  validityDays: number;
+  price: number;
+  isActive?: boolean;
+}
+
+export interface UpdateRechargePlanDTO {
+  planName?: string;
+  planType?: string[];        
+  description?: string;
+  rideLimit?: number;
+  validityDays?: number;
+  price?: number;
+  isActive?: boolean;
+}
+
+
 export const RechargePlanRepository = {
 
   /**
@@ -41,24 +65,26 @@ export const RechargePlanRepository = {
    * 🔹 CREATE PLAN
    * planType = ARRAY (multi select)
    */
-  async create(data: any) {
+  async create(data: CreateRechargePlanDTO) {
     const res = await query(
-      `INSERT INTO recharge_plans
-       (
-         plan_name,
-         plan_type,
-         description,
-         ride_limit,
-         validity_days,
-         price,
-         is_active
-       )
-       VALUES ($1,$2,$3,$4,$5,$6,$7)
-       RETURNING *`,
+      `
+      INSERT INTO recharge_plans
+      (
+        plan_name,
+        plan_type,
+        description,
+        ride_limit,
+        validity_days,
+        price,
+        is_active
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7)
+      RETURNING *
+      `,
       [
         data.planName,
-        data.planType,
-        data.description || null,
+        data.planType,                 
+        data.description ?? null,
         data.rideLimit,
         data.validityDays,
         data.price,
@@ -68,36 +94,41 @@ export const RechargePlanRepository = {
 
     return res.rows[0];
   },
-
+  
   /**
    * 🔹 UPDATE PLAN
    * planType = ARRAY (multi select)
    */
-  async update(id: number, data: any) {
+  async update(id: number, data: UpdateRechargePlanDTO) {
     const res = await query(
-      `UPDATE recharge_plans
-       SET
-         plan_name     = COALESCE($1, plan_name),
-         plan_type     = COALESCE($2, plan_type),
-         description   = COALESCE($3, description),
-         ride_limit    = COALESCE($4, ride_limit),
-         validity_days = COALESCE($5, validity_days),
-         price         = COALESCE($6, price)
-       WHERE id = $7
-       RETURNING *`,
+      `
+      UPDATE recharge_plans
+      SET
+        plan_name     = COALESCE($1, plan_name),
+        plan_type     = COALESCE($2, plan_type),
+        description   = COALESCE($3, description),
+        ride_limit    = COALESCE($4, ride_limit),
+        validity_days = COALESCE($5, validity_days),
+        price         = COALESCE($6, price),
+        is_active     = COALESCE($7, is_active)
+      WHERE id = $8
+      RETURNING *
+      `,
       [
-        data.planName || null,
-        data.planType || null,   // ✅ ARRAY
-        data.description || null,
-        data.rideLimit || null,
-        data.validityDays || null,
-        data.price || null,
+        data.planName ?? null,
+        data.planType ?? null,
+        data.description ?? null,
+        data.rideLimit ?? null,
+        data.validityDays ?? null,
+        data.price ?? null,
+        data.isActive ?? null,
         id,
       ]
     );
 
     return res.rows[0];
   },
+  
   async countActivePlans() {
     const res = await query(
       `SELECT COUNT(*) AS total

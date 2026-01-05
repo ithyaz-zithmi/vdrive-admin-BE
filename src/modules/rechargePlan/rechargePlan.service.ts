@@ -1,4 +1,8 @@
 import { RechargePlanRepository } from './rechargePlan.repository';
+import {
+  CreateRechargePlanDTO,
+  UpdateRechargePlanDTO,
+} from './rechargePlan.repository';
 
 export const RechargePlanService = {
 
@@ -7,44 +11,51 @@ export const RechargePlanService = {
   },
 
   async getPlanById(id: number) {
-    return RechargePlanRepository.getById(id);
+    const plan = await RechargePlanRepository.getById(id);
+    if (!plan) {
+      throw { statusCode: 404, message: 'Recharge plan not found' };
+    }
+    return plan;
   },
 
- 
-  async createPlan(data: any) {
+  async createPlan(data: CreateRechargePlanDTO) {
     const isActive = data.isActive ?? true;
 
     if (isActive === true) {
       const activeCount = await RechargePlanRepository.countActivePlans();
-
       if (activeCount >= 5) {
-        throw new Error('Only 5 plans can be active at a time');
+        throw {
+          statusCode: 400,
+          message: 'Only 5 plans can be active at a time',
+        };
       }
     }
 
     return RechargePlanRepository.create(data);
   },
 
-  // 🔥 UPDATE – active limit check
-  async updatePlan(id: number, data: any) {
+  async updatePlan(id: number, data: UpdateRechargePlanDTO) {
     if (data.isActive === true) {
       const activeCount = await RechargePlanRepository.countActivePlans();
-
       if (activeCount >= 5) {
-        throw new Error('Only 5 plans can be active at a time');
+        throw {
+          statusCode: 400,
+          message: 'Only 5 plans can be active at a time',
+        };
       }
     }
 
     return RechargePlanRepository.update(id, data);
   },
 
-  // 🔥 TOGGLE – active limit check
   async toggleStatus(id: number, status: boolean) {
     if (status === true) {
       const activeCount = await RechargePlanRepository.countActivePlans();
-
       if (activeCount >= 5) {
-        throw new Error('Only 5 plans can be active at a time');
+        throw {
+          statusCode: 400,
+          message: 'Only 5 plans can be active at a time',
+        };
       }
     }
 

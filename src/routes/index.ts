@@ -1,4 +1,5 @@
-// src/routes/index.ts
+
+
 import { Router } from 'express';
 import userRoutes from '../modules/admin-users/adminUser.routes';
 import userManagementRoutes from '../modules/user-management/userManagement.routes';
@@ -19,8 +20,7 @@ router.get('/health-check', (req, res) => {
 });
 router.use('/auth', authRoutes);
 
-router.use(isAuthenticated);
-
+// router.use(isAuthenticated);
 
 router.use('/locations', locationRoutes);
 router.use('/hotspots', hotspotRoutes);

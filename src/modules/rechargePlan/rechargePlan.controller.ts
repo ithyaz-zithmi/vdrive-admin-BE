@@ -55,9 +55,6 @@ export const RechargePlanController = {
     }
   },
   
-
-
-  
   async editRechargePlan(req: Request, res: Response, next: NextFunction) {
     try {
       const plan = await RechargePlanService.updatePlan(Number(req.params.id), req.body);

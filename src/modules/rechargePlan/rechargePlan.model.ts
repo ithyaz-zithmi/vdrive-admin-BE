@@ -1,19 +1,17 @@
-
 export type PlanType =
   | 'ONE-WAY'
   | 'ROUND-TRIP'
   | 'OUT-STATION'
   | 'SCHEDULE';
+
 export interface RechargePlan {
-  id?: number;
+  id: number;
   plan_name: string;
   plan_type: PlanType[];
-  description?: string;
+  description?: string | null;
   ride_limit: number;
   validity_days: number;
   price: number;
   is_active: boolean;
-  created_at?: Date;
+  created_at: Date;
 }
-
-
