@@ -11,6 +11,7 @@ export const forwardRequest = async (req: any, res: any, next: any, url: string)
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': config.internalServiceApiKey,
+        'x-admin-id': req.user?.id,
       },
       data,
     };
