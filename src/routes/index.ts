@@ -19,7 +19,7 @@ router.get('/health-check', (req, res) => {
 });
 router.use('/auth', authRoutes);
 
-router.use(isAuthenticated);
+// router.use(isAuthenticated);
 
 
 router.use('/locations', locationRoutes);

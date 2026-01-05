@@ -1,35 +1,57 @@
-
 import { RechargePlanRepository } from './rechargePlan.repository';
 
 export const RechargePlanService = {
-  
- 
-  async getPlans(page: number = 1, limit: number = 10) {
-    return await RechargePlanRepository.getPlans(page, limit);
+
+  async getPlans(page = 1, limit = 10) {
+    return RechargePlanRepository.getPlans(page, limit);
   },
 
- 
   async getPlanById(id: number) {
-    return await RechargePlanRepository.getById(id);
+    return RechargePlanRepository.getById(id);
   },
 
-
+ 
   async createPlan(data: any) {
-    return await RechargePlanRepository.create(data);
+    const isActive = data.isActive ?? true;
+
+    if (isActive === true) {
+      const activeCount = await RechargePlanRepository.countActivePlans();
+
+      if (activeCount >= 5) {
+        throw new Error('Only 5 plans can be active at a time');
+      }
+    }
+
+    return RechargePlanRepository.create(data);
   },
 
-
+  // 🔥 UPDATE – active limit check
   async updatePlan(id: number, data: any) {
-    return await RechargePlanRepository.update(id, data);
+    if (data.isActive === true) {
+      const activeCount = await RechargePlanRepository.countActivePlans();
+
+      if (activeCount >= 5) {
+        throw new Error('Only 5 plans can be active at a time');
+      }
+    }
+
+    return RechargePlanRepository.update(id, data);
   },
 
-  
+  // 🔥 TOGGLE – active limit check
   async toggleStatus(id: number, status: boolean) {
-    return await RechargePlanRepository.toggle(id, status);
+    if (status === true) {
+      const activeCount = await RechargePlanRepository.countActivePlans();
+
+      if (activeCount >= 5) {
+        throw new Error('Only 5 plans can be active at a time');
+      }
+    }
+
+    return RechargePlanRepository.toggle(id, status);
   },
 
   async deletePlan(id: number) {
-    return await RechargePlanRepository.delete(id);
+    return RechargePlanRepository.delete(id);
   },
 };
-
