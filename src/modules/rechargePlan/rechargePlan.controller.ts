@@ -4,6 +4,21 @@ import { RechargePlanService } from './rechargePlan.service';
 
 export const RechargePlanController = {
 
+
+    async createRechargePlan(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log('Backend: Received request body:', req.body);
+      const plan = await RechargePlanService.createPlan(req.body);
+      return res.status(201).json({
+        message: "Recharge plan created successfully",
+        data: plan
+      });
+    } catch (err) {
+      console.error('Backend: Create plan error:', err);
+      next(err);
+    }
+  },
+
  
   async getRechargePlans(req: Request, res: Response, next: NextFunction) {
     try {
@@ -40,19 +55,7 @@ export const RechargePlanController = {
     }
   },
   
-  async createRechargePlan(req: Request, res: Response, next: NextFunction) {
-    try {
-      console.log('Backend: Received request body:', req.body);
-      const plan = await RechargePlanService.createPlan(req.body);
-      return res.status(201).json({
-        message: "Recharge plan created successfully",
-        data: plan
-      });
-    } catch (err) {
-      console.error('Backend: Create plan error:', err);
-      next(err);
-    }
-  },
+
 
   
   async editRechargePlan(req: Request, res: Response, next: NextFunction) {
