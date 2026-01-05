@@ -73,7 +73,7 @@ export const RechargePlanController = {
       const { isActive } = req.body;
       const plan = await RechargePlanService.toggleStatus(Number(req.params.id), isActive);
       return res.status(200).json({
-        message: "Recharge plan status updated successfully",
+        message: "Recharge plan status updated successfully ",
         data: plan
       });
     } catch (err) {

@@ -29,7 +29,7 @@ export const RechargePlanValidation = {
         'any.required': 'Plan name is required',
       }),
 
-    // 🔥 ANY planType allowed (array)
+    // ANY planType allowed (array)
     planType: Joi.array()
       .items(
         Joi.string()
