@@ -128,6 +128,7 @@
     "semver": "^7.7.2",
     "shebang-command": "^2.0.0",
     "shebang-regex": "^3.0.0",
+    "socket.io": "^4.8.3",
     "strip-json-comments": "^3.1.1",
     "supports-color": "^7.2.0",
     "synckit": "^0.11.11",

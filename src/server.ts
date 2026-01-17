@@ -7,6 +7,8 @@ import config from './config';
 const PORT = config.port || 3000;
 const dbUser = config.db.user;
 
+import { initSocket } from './services/socket';
+
 async function startServer() {
   try {
     await connectDatabase();
@@ -17,6 +19,8 @@ async function startServer() {
       logger.info(`Environment: ${config.nodeEnv}`);
       logger.info(`Health check: http://localhost:${PORT}`);
     });
+
+    initSocket(server);
 
     const shutdown = (signal: string) => {
       logger.info(`${signal} received, shutting down gracefully`);
