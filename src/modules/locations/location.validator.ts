@@ -23,6 +23,20 @@ export const LocationValidation = {
     }),
   }),
 
+  stateIdValidation: Joi.object().keys({
+    state_id: Joi.string().uuid().required().messages({
+      'string.guid': 'State ID must be a valid UUID',
+      'any.required': 'State ID is required',
+    }),
+  }),
+
+  cityIdValidation: Joi.object().keys({
+    city_id: Joi.string().uuid().required().messages({
+      'string.guid': 'City ID must be a valid UUID',
+      'any.required': 'City ID is required',
+    }),
+  }),
+
   statesQueryValidation: Joi.object().keys({
     page: Joi.number().integer().min(1).default(1),
     limit: Joi.number().integer().min(1).max(100).default(20),

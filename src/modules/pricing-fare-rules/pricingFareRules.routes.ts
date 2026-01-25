@@ -45,6 +45,21 @@ router.delete(
   PricingFareRulesController.deletePricingFareRule
 );
 
+// CREATE pricing fare rule with time slots
+router.post(
+  '/with-slots',
+  validateBody(PricingFareRulesValidation.createPricingRuleWithSlotsValidation),
+  PricingFareRulesController.createPricingRuleWithSlots
+);
+
+// UPDATE pricing fare rule with time slots
+router.put(
+  '/with-slots/:id',
+  validateParams(PricingFareRulesValidation.pricingFareRuleIdValidation),
+  validateBody(PricingFareRulesValidation.updatePricingRuleWithSlotsValidation),
+  PricingFareRulesController.updatePricingRuleWithSlots
+);
+
 // ==================== DRIVER TIME SLOTS PRICING ROUTES ====================
 
 // GET all driver time slots pricing

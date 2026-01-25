@@ -56,6 +56,38 @@ export const LocationService = {
     return location;
   },
 
+  async getCountryById(id: string): Promise<Country> {
+    const country = await LocationRepository.getCountryById(id);
+    if (!country) {
+      throw { statusCode: 404, message: 'Country not found' };
+    }
+    return country;
+  },
+
+  async getStateById(id: string): Promise<State> {
+    const state = await LocationRepository.getStateById(id);
+    if (!state) {
+      throw { statusCode: 404, message: 'State not found' };
+    }
+    return state;
+  },
+
+  async getCityById(id: string): Promise<City> {
+    const city = await LocationRepository.getCityById(id);
+    if (!city) {
+      throw { statusCode: 404, message: 'City not found' };
+    }
+    return city;
+  },
+
+  async getAreaById(id: string): Promise<Area> {
+    const area = await LocationRepository.getAreaById(id);
+    if (!area) {
+      throw { statusCode: 404, message: 'Area not found' };
+    }
+    return area;
+  },
+
   async addCountry(data: {
     country_code: string;
     country_name: string;

@@ -88,6 +88,46 @@ class LocationController {
     }
   }
 
+  static async getCountryById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { country_id } = req.params;
+      const country = await LocationService.getCountryById(country_id);
+      return successResponse(res, 200, 'Country fetched successfully', country);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async getStateById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { state_id } = req.params;
+      const state = await LocationService.getStateById(state_id);
+      return successResponse(res, 200, 'State fetched successfully', state);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async getCityById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { city_id } = req.params;
+      const city = await LocationService.getCityById(city_id);
+      return successResponse(res, 200, 'City fetched successfully', city);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async getAreaById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { area_id } = req.params;
+      const area = await LocationService.getAreaById(area_id);
+      return successResponse(res, 200, 'Area fetched successfully', area);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static async addCountry(req: Request, res: Response, next: NextFunction) {
     try {
       const countryData = req.body;

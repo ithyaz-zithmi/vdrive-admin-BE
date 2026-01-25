@@ -14,9 +14,6 @@ export const HotspotValidation = {
   }),
 
   createHotspotValidation: Joi.object().keys({
-    id: Joi.string().required().messages({
-      'any.required': 'ID is required',
-    }),
     hotspot_name: Joi.string().required().messages({
       'any.required': 'Hotspot name is required',
     }),

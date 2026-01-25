@@ -108,6 +108,43 @@ class PricingFareRulesController {
       next(err);
     }
   }
+
+  static async createPricingRuleWithSlots(req: Request, res: Response, next: NextFunction) {
+    try {
+      const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+      logger.info(`🆕 Pricing fare rule with slots creation from ${ip}`);
+
+      const data = req.body;
+      const result = await PricingFareRulesService.createPricingRuleWithSlots(data);
+
+      logger.info(
+        `✅ Pricing fare rule created with ${result.timeSlots.length} time slots: ID ${result.pricingRule.id}`
+      );
+      successResponse(res, 201, 'Pricing fare rule with slots created successfully', result);
+    } catch (err: any) {
+      logger.error(`❌ Pricing fare rule with slots creation failed: ${err.message}`);
+      next(err);
+    }
+  }
+
+  static async updatePricingRuleWithSlots(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+      logger.info(`✏️ Pricing fare rule with slots update: ID ${id} from ${ip}`);
+
+      const data = req.body;
+      const result = await PricingFareRulesService.updatePricingRuleWithSlots(id, data);
+
+      logger.info(
+        `✅ Pricing fare rule updated with ${result.timeSlots.length} time slots: ID ${result.pricingRule.id}`
+      );
+      successResponse(res, 200, 'Pricing fare rule with slots updated successfully', result);
+    } catch (err: any) {
+      logger.error(`❌ Pricing fare rule with slots update failed: ${err.message}`);
+      next(err);
+    }
+  }
 }
 
 export default PricingFareRulesController;

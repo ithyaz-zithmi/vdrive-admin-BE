@@ -34,6 +34,30 @@ router.get(
 );
 
 router.get(
+  '/country/:country_id',
+  validateParams(LocationValidation.countryIdValidation),
+  LocationController.getCountryById
+);
+
+router.get(
+  '/state/:state_id',
+  validateParams(LocationValidation.stateIdValidation),
+  LocationController.getStateById
+);
+
+router.get(
+  '/city/:city_id',
+  validateParams(LocationValidation.cityIdValidation),
+  LocationController.getCityById
+);
+
+router.get(
+  '/area/:area_id',
+  validateParams(LocationValidation.areaIdValidation),
+  LocationController.getAreaById
+);
+
+router.get(
   '/full-location/:area_id',
   validateParams(LocationValidation.areaIdValidation),
   LocationController.getFullLocation

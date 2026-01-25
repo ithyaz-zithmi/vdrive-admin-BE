@@ -18,28 +18,23 @@ export const HotspotService = {
     return hotspot;
   },
 
-  async addHotspot(data: {
-    id: string;
+  async createHotspot(data: {
     hotspot_name: string;
     fare: number;
     multiplier: number;
   }): Promise<Hotspot> {
-    // Check if ID already exists
-    const existingId = await HotspotRepository.getHotspotById(data.id);
-    if (existingId) {
-      throw { statusCode: 409, message: 'Hotspot ID already exists' };
+    // Check if hotspot with the same name already exists
+    const existingHotspot = await HotspotRepository.getHotspotByName(data.hotspot_name);
+    if (existingHotspot) {
+      throw { statusCode: 409, message: 'Hotspot with this name already exists' };
     }
 
-    // Check if hotspot name already exists
-    const existingName = await HotspotRepository.getHotspotByName(data.hotspot_name);
-    if (existingName) {
-      throw { statusCode: 409, message: 'Hotspot name already exists' };
-    }
-
-    // Validate fare and multiplier
+    // Validate fare
     if (data.fare < 0) {
       throw { statusCode: 400, message: 'Fare cannot be negative' };
     }
+
+    // Validate multiplier
     if (data.multiplier <= 0) {
       throw { statusCode: 400, message: 'Multiplier must be greater than 0' };
     }
