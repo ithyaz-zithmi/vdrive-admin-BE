@@ -48,6 +48,14 @@ export const LocationService = {
     return location;
   },
 
+  async getLocationByZipcode(zipcode: string): Promise<any> {
+    const location = await LocationRepository.getLocationByZipcode(zipcode);
+    if (!location) {
+      throw { statusCode: 404, message: 'Location not found for this zipcode' };
+    }
+    return location;
+  },
+
   async addCountry(data: {
     country_code: string;
     country_name: string;

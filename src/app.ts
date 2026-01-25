@@ -16,11 +16,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Core middlewares
+app.use(middlewares.corsMiddleware); // CORS must be first to handle preflights and errors with headers
 app.use(middlewares.requestId);
 app.use(middlewares.requestLogger);
 app.use(middlewares.rateLimiter);
 app.use(middlewares.security);
-app.use(middlewares.corsMiddleware);
 app.use(middlewares.compressionMiddleware);
 
 // Routes

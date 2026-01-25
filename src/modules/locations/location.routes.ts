@@ -39,6 +39,8 @@ router.get(
   LocationController.getFullLocation
 );
 
+router.get('/zipcode/:zipcode', LocationController.getLocationByZipcode);
+
 // -------------------- WRITE ROUTES --------------------
 router.post(
   '/countries',

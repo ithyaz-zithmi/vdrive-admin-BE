@@ -79,7 +79,7 @@ export const LocationValidation = {
   }),
 
   createAreaValidation: Joi.object().keys({
-    area_name: Joi.string().required().messages({
+    place: Joi.string().required().messages({
       'any.required': 'Area name is required',
     }),
     country_id: Joi.string().uuid().required().messages({
@@ -88,5 +88,6 @@ export const LocationValidation = {
     }),
     state_id: Joi.string().uuid().optional(),
     city_id: Joi.string().uuid().optional(),
+    zipcode: Joi.string().optional(),
   }),
 };

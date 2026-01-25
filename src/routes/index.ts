@@ -12,6 +12,7 @@ import packageRoutes from '../modules/packages/package.routes';
 import s3Routes from '../modules/s3/s3.routes';
 import driverReconciliationRoutes from '../modules/driver-reconciliation/driverReconciliation.routes';
 import rechargePlanRoutes from '../modules/rechargePlan/rechargePlan.routes';
+import pricingFareRulesRoutes from '../modules/pricing-fare-rules/pricingFareRules.routes';
 
 const router = Router();
 
@@ -32,5 +33,6 @@ router.use('/trips', tripManagementRoutes);
 router.use('/generate-presigned-url', s3Routes);
 router.use('/driver-reconciliation', driverReconciliationRoutes);
 router.use('/recharge-plans', rechargePlanRoutes);
+router.use('/pricing-fare-rules', pricingFareRulesRoutes);
 
 export default router;

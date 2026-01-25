@@ -78,6 +78,16 @@ class LocationController {
     }
   }
 
+  static async getLocationByZipcode(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { zipcode } = req.params;
+      const location = await LocationService.getLocationByZipcode(zipcode);
+      return successResponse(res, 200, 'Location fetched successfully', location);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static async addCountry(req: Request, res: Response, next: NextFunction) {
     try {
       const countryData = req.body;

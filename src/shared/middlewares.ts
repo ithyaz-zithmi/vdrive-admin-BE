@@ -24,7 +24,7 @@ const requestLogger = morgan('combined', {
 // Rate Limiter
 const rateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 1000, // Increased for dev; 100 was too low for autocomplete
   standardHeaders: true,
   legacyHeaders: false,
   message: { statusCode: 429, success: false, message: 'Too many requests' },

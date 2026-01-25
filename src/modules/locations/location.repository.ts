@@ -225,6 +225,75 @@ export const LocationRepository = {
     return location;
   },
 
+  async getLocationByZipcode(zipcode: string): Promise<any> {
+    const result = await query(
+      `SELECT
+        a.id as area_id, a.place as area_place, a.city_id, a.state_id, a.country_id, a.zipcode,
+        c.id as country_id, c.country_code, c.country_name, c.country_flag,
+        s.id as state_id, s.state_code, s.state_name,
+        ci.id as city_id, ci.city_name
+      FROM areas a
+      LEFT JOIN cities ci ON a.city_id = ci.id
+      LEFT JOIN states s ON a.state_id = s.id
+      LEFT JOIN countries c ON a.country_id = c.id
+      WHERE a.zipcode = $1
+      LIMIT 1`,
+      [zipcode]
+    );
+
+    if (!result.rows[0]) {
+      return null;
+    }
+
+    const row = result.rows[0];
+    const location: any = {
+      area: null,
+      city: null,
+      state: null,
+      country: null,
+    };
+
+    if (row.area_id) {
+      location.area = {
+        id: row.area_id,
+        place: row.area_place,
+        city_id: row.city_id,
+        state_id: row.state_id,
+        country_id: row.country_id,
+        zipcode: row.zipcode,
+      };
+    }
+
+    if (row.city_id) {
+      location.city = {
+        id: row.city_id,
+        city_name: row.city_name,
+        state_id: row.state_id,
+        country_id: row.country_id,
+      };
+    }
+
+    if (row.state_id) {
+      location.state = {
+        id: row.state_id,
+        state_code: row.state_code,
+        state_name: row.state_name,
+        country_id: row.country_id,
+      };
+    }
+
+    if (row.country_id) {
+      location.country = {
+        id: row.country_id,
+        country_code: row.country_code,
+        country_name: row.country_name,
+        country_flag: row.country_flag,
+      };
+    }
+
+    return location;
+  },
+
   // Inserts
   async createCountry(data: {
     country_code: string;
