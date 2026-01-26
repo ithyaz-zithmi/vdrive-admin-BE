@@ -33,18 +33,18 @@ class LocationController {
     }
   }
 
-  static async getCities(req: Request, res: Response, next: NextFunction) {
+  static async getDistricts(req: Request, res: Response, next: NextFunction) {
     try {
-      const { country_id } = req.params;
-      const { state_id, search, page, limit } = req.query;
-      const cities = await LocationService.getCities(
-        country_id,
-        (state_id as string) || null,
+      const { state_id } = req.params;
+      const { country_id, search, page, limit } = req.query;
+      const districts = await LocationService.getDistricts(
+        state_id,
+        (country_id as string) || null,
         (search as string) || '',
         parseInt(page as string, 10) || 1,
         parseInt(limit as string, 10) || 10
       );
-      return successResponse(res, 200, 'Cities fetched successfully', cities);
+      return successResponse(res, 200, 'Districts fetched successfully', districts);
     } catch (err) {
       next(err);
     }
@@ -52,12 +52,11 @@ class LocationController {
 
   static async getAreas(req: Request, res: Response, next: NextFunction) {
     try {
-      const { country_id } = req.params;
-      const { state_id, city_id, search, page, limit } = req.query;
+      const { district_id } = req.params;
+      const { state_id, search, page, limit } = req.query;
       const areas = await LocationService.getAreas(
-        country_id,
+        district_id,
         (state_id as string) || null,
-        (city_id as string) || null,
         (search as string) || '',
         parseInt(page as string, 10) || 1,
         parseInt(limit as string, 10) || 10
@@ -78,10 +77,10 @@ class LocationController {
     }
   }
 
-  static async getLocationByZipcode(req: Request, res: Response, next: NextFunction) {
+  static async getLocationByPincode(req: Request, res: Response, next: NextFunction) {
     try {
-      const { zipcode } = req.params;
-      const location = await LocationService.getLocationByZipcode(zipcode);
+      const { pincode } = req.params;
+      const location = await LocationService.getLocationByPincode(pincode);
       return successResponse(res, 200, 'Location fetched successfully', location);
     } catch (err) {
       next(err);
@@ -108,11 +107,11 @@ class LocationController {
     }
   }
 
-  static async getCityById(req: Request, res: Response, next: NextFunction) {
+  static async getDistrictById(req: Request, res: Response, next: NextFunction) {
     try {
-      const { city_id } = req.params;
-      const city = await LocationService.getCityById(city_id);
-      return successResponse(res, 200, 'City fetched successfully', city);
+      const { district_id } = req.params;
+      const district = await LocationService.getDistrictById(district_id);
+      return successResponse(res, 200, 'District fetched successfully', district);
     } catch (err) {
       next(err);
     }
@@ -147,11 +146,11 @@ class LocationController {
       next(err);
     }
   }
-  static async addCity(req: Request, res: Response, next: NextFunction) {
+  static async addDistrict(req: Request, res: Response, next: NextFunction) {
     try {
-      const cityData = req.body;
-      const newCity = await LocationService.addCity(cityData);
-      return successResponse(res, 201, 'City added successfully', newCity);
+      const districtData = req.body;
+      const newDistrict = await LocationService.addDistrict(districtData);
+      return successResponse(res, 201, 'District added successfully', newDistrict);
     } catch (err) {
       next(err);
     }
@@ -161,6 +160,92 @@ class LocationController {
       const areaData = req.body;
       const newArea = await LocationService.addArea(areaData);
       return successResponse(res, 201, 'Area added successfully', newArea);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  // Update handlers
+  static async updateCountry(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { country_id } = req.params;
+      const data = req.body;
+      const updated = await LocationService.updateCountry(country_id, data);
+      return successResponse(res, 200, 'Country updated successfully', updated);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async updateState(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { state_id } = req.params;
+      const data = req.body;
+      const updated = await LocationService.updateState(state_id, data);
+      return successResponse(res, 200, 'State updated successfully', updated);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async updateDistrict(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { district_id } = req.params;
+      const data = req.body;
+      const updated = await LocationService.updateDistrict(district_id, data);
+      return successResponse(res, 200, 'District updated successfully', updated);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async updateArea(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { area_id } = req.params;
+      const data = req.body;
+      const updated = await LocationService.updateArea(area_id, data);
+      return successResponse(res, 200, 'Area updated successfully', updated);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  // Delete handlers
+  static async deleteCountry(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { country_id } = req.params;
+      await LocationService.deleteCountry(country_id);
+      return successResponse(res, 200, 'Country deleted successfully', { id: country_id });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async deleteState(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { state_id } = req.params;
+      await LocationService.deleteState(state_id);
+      return successResponse(res, 200, 'State deleted successfully', { id: state_id });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async deleteDistrict(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { district_id } = req.params;
+      await LocationService.deleteDistrict(district_id);
+      return successResponse(res, 200, 'District deleted successfully', { id: district_id });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async deleteArea(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { area_id } = req.params;
+      await LocationService.deleteArea(area_id);
+      return successResponse(res, 200, 'Area deleted successfully', { id: area_id });
     } catch (err) {
       next(err);
     }

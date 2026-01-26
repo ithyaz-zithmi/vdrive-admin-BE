@@ -20,15 +20,15 @@ router.get(
 );
 
 router.get(
-  '/cities/:country_id',
-  validateParams(LocationValidation.countryIdValidation),
-  validateQuery(LocationValidation.citiesQueryValidation),
-  LocationController.getCities
+  '/districts/:state_id',
+  validateParams(LocationValidation.stateIdValidation),
+  validateQuery(LocationValidation.districtsQueryValidation),
+  LocationController.getDistricts
 );
 
 router.get(
-  '/areas/:country_id',
-  validateParams(LocationValidation.countryIdValidation),
+  '/areas/:district_id',
+  validateParams(LocationValidation.districtIdValidation),
   validateQuery(LocationValidation.areasQueryValidation),
   LocationController.getAreas
 );
@@ -46,9 +46,9 @@ router.get(
 );
 
 router.get(
-  '/city/:city_id',
-  validateParams(LocationValidation.cityIdValidation),
-  LocationController.getCityById
+  '/district/:district_id',
+  validateParams(LocationValidation.districtIdValidation),
+  LocationController.getDistrictById
 );
 
 router.get(
@@ -63,7 +63,7 @@ router.get(
   LocationController.getFullLocation
 );
 
-router.get('/zipcode/:zipcode', LocationController.getLocationByZipcode);
+router.get('/pincode/:pincode', LocationController.getLocationByPincode);
 
 // -------------------- WRITE ROUTES --------------------
 router.post(
@@ -79,15 +79,69 @@ router.post(
 );
 
 router.post(
-  '/cities',
-  validateBody(LocationValidation.createCityValidation),
-  LocationController.addCity
+  '/districts',
+  validateBody(LocationValidation.createDistrictValidation),
+  LocationController.addDistrict
 );
 
 router.post(
   '/areas',
   validateBody(LocationValidation.createAreaValidation),
   LocationController.addArea
+);
+
+// -------------------- UPDATE ROUTES --------------------
+router.put(
+  '/countries/:country_id',
+  validateParams(LocationValidation.countryIdValidation),
+  validateBody(LocationValidation.updateCountryValidation),
+  LocationController.updateCountry
+);
+
+router.put(
+  '/states/:state_id',
+  validateParams(LocationValidation.stateIdValidation),
+  validateBody(LocationValidation.updateStateValidation),
+  LocationController.updateState
+);
+
+router.put(
+  '/districts/:district_id',
+  validateParams(LocationValidation.districtIdValidation),
+  validateBody(LocationValidation.updateDistrictValidation),
+  LocationController.updateDistrict
+);
+
+router.put(
+  '/areas/:area_id',
+  validateParams(LocationValidation.areaIdValidation),
+  validateBody(LocationValidation.updateAreaValidation),
+  LocationController.updateArea
+);
+
+// -------------------- DELETE ROUTES --------------------
+router.delete(
+  '/countries/:country_id',
+  validateParams(LocationValidation.countryIdValidation),
+  LocationController.deleteCountry
+);
+
+router.delete(
+  '/states/:state_id',
+  validateParams(LocationValidation.stateIdValidation),
+  LocationController.deleteState
+);
+
+router.delete(
+  '/districts/:district_id',
+  validateParams(LocationValidation.districtIdValidation),
+  LocationController.deleteDistrict
+);
+
+router.delete(
+  '/areas/:area_id',
+  validateParams(LocationValidation.areaIdValidation),
+  LocationController.deleteArea
 );
 
 export default router;
