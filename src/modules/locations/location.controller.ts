@@ -39,7 +39,7 @@ class LocationController {
       const { country_id, search, page, limit } = req.query;
       const districts = await LocationService.getDistricts(
         state_id,
-        (country_id as string) || null,
+        (country_id as string) || '',
         (search as string) || '',
         parseInt(page as string, 10) || 1,
         parseInt(limit as string, 10) || 10

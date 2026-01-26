@@ -23,7 +23,7 @@ export const PricingFareRulesRepository = {
 
     // Build dynamic WHERE conditions
     if (filters.area_id) {
-      whereConditions.push(`p.area_id = $${paramIndex}`); // Assuming city_id maps to area_id
+      whereConditions.push(`p.area_id = $${paramIndex}`);
       params.push(filters.area_id);
       paramIndex++;
     }
@@ -118,9 +118,8 @@ export const PricingFareRulesRepository = {
    * Get a single pricing fare rule by ID
    */
   async getPricingFareRuleById(id: string): Promise<PricingFareRule | null> {
-    // Map city_id to area_id for consistency in Model
     const result = await query(
-      'SELECT id, district_id, city_id as area_id, global_price, is_hotspot, hotspot_id, multiplier FROM price_and_fare_rules WHERE id = $1',
+      'SELECT id, district_id, area_id, global_price, is_hotspot, hotspot_id, multiplier FROM price_and_fare_rules WHERE id = $1',
       [id]
     );
     return result.rows[0] || null;
@@ -211,7 +210,7 @@ export const PricingFareRulesRepository = {
       paramIndex++;
     }
     if (data.area_id !== undefined) {
-      fields.push(`city_id = $${paramIndex}`); // Map area_id to city_id
+      fields.push(`area_id = $${paramIndex}`);
       params.push(data.area_id);
       paramIndex++;
     }
@@ -241,7 +240,7 @@ export const PricingFareRulesRepository = {
     }
 
     const result = await query(
-      `UPDATE price_and_fare_rules SET ${fields.join(', ')} WHERE id = $1 RETURNING id, district_id, city_id as area_id, global_price, is_hotspot, hotspot_id, multiplier`,
+      `UPDATE price_and_fare_rules SET ${fields.join(', ')} WHERE id = $1 RETURNING id, district_id, area_id, global_price, is_hotspot, hotspot_id, multiplier`,
       params
     );
     return result.rows[0];

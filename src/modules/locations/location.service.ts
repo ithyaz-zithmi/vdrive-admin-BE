@@ -95,7 +95,12 @@ export const LocationService = {
     return await LocationRepository.createCountry(data);
   },
 
-  async addState(data: { code?: string | null; name: string; country_id: string }): Promise<State> {
+  async addState(data: {
+    code?: string | null;
+    name: string;
+    country_id: string;
+    created_by?: string;
+  }): Promise<State> {
     if (data.code) {
       const existingState = await LocationRepository.getStateByStateCode(
         data.code,
@@ -109,13 +114,14 @@ export const LocationService = {
     if (!country) {
       throw { statusCode: 404, message: 'Country not found' };
     }
-    return await LocationRepository.createState(data);
+    return await LocationRepository.createState(data, data.created_by || null);
   },
 
   async addDistrict(data: {
     name: string;
     state_id: string;
     country_id: string;
+    created_by?: string;
   }): Promise<District> {
     if (data.state_id) {
       const existingDistrict = await LocationRepository.getDistrictByName(
@@ -131,7 +137,7 @@ export const LocationService = {
         throw { statusCode: 404, message: 'State not found' };
       }
     }
-    return await LocationRepository.createDistrict(data);
+    return await LocationRepository.createDistrict(data, data.created_by || null);
   },
   async addArea(data: {
     name: string;
@@ -139,6 +145,7 @@ export const LocationService = {
     state_id: string;
     country_id: string;
     pincode: string;
+    created_by?: string;
   }): Promise<Area> {
     if (data.district_id) {
       const existingArea = await LocationRepository.getAreaByAreaName(
@@ -155,7 +162,7 @@ export const LocationService = {
         throw { statusCode: 404, message: 'District not found' };
       }
     }
-    return await LocationRepository.createArea(data);
+    return await LocationRepository.createArea(data, data.created_by || null);
   },
 
   async updateCountry(
@@ -179,7 +186,7 @@ export const LocationService = {
 
   async updateState(
     id: string,
-    data: { name: string; code?: string | null; country_id: string }
+    data: { name: string; code?: string | null; country_id: string; updated_by?: string }
   ): Promise<State> {
     const state = await LocationRepository.getStateById(id);
     if (!state) throw { statusCode: 404, message: 'State not found' };
@@ -189,7 +196,7 @@ export const LocationService = {
       if (!country) throw { statusCode: 404, message: 'Country not found' };
     }
 
-    const updated = await LocationRepository.updateState(id, data);
+    const updated = await LocationRepository.updateState(id, data, data.updated_by || null);
     if (!updated) throw { statusCode: 500, message: 'Failed to update state' };
     return updated;
   },
@@ -203,7 +210,7 @@ export const LocationService = {
 
   async updateDistrict(
     id: string,
-    data: { name: string; state_id: string; country_id: string }
+    data: { name: string; state_id: string; country_id: string; updated_by?: string }
   ): Promise<District> {
     const district = await LocationRepository.getDistrictById(id);
     if (!district) throw { statusCode: 404, message: 'District not found' };
@@ -214,7 +221,7 @@ export const LocationService = {
       if (!state) throw { statusCode: 404, message: 'State not found' };
     }
 
-    const updated = await LocationRepository.updateDistrict(id, data);
+    const updated = await LocationRepository.updateDistrict(id, data, data.updated_by || null);
     if (!updated) throw { statusCode: 500, message: 'Failed to update district' };
     return updated;
   },
@@ -234,6 +241,7 @@ export const LocationService = {
       state_id: string;
       country_id: string;
       pincode: string;
+      updated_by?: string;
     }
   ): Promise<Area> {
     const area = await LocationRepository.getAreaById(id);
@@ -244,7 +252,7 @@ export const LocationService = {
       if (!district) throw { statusCode: 404, message: 'District not found' };
     }
 
-    const updated = await LocationRepository.updateArea(id, data, 'admin-uuid');
+    const updated = await LocationRepository.updateArea(id, data, data.updated_by || null);
     if (!updated) throw { statusCode: 500, message: 'Failed to update area' };
     return updated;
   },

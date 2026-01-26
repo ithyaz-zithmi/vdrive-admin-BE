@@ -464,7 +464,7 @@ export const LocationRepository = {
       name: string;
       country_id: string;
     },
-    admin_id: string
+    admin_id: string | null
   ): Promise<State> {
     const result = await query(
       `INSERT INTO states (code, name, country_id, created_by) 
@@ -481,7 +481,7 @@ export const LocationRepository = {
       state_id: string;
       country_id: string;
     },
-    admin_id: string
+    admin_id: string | null
   ): Promise<District> {
     const result = await query(
       `INSERT INTO districts (name, state_id, country_id, created_by) 
@@ -500,7 +500,7 @@ export const LocationRepository = {
       country_id: string;
       pincode: string;
     },
-    admin_id: string
+    admin_id: string | null
   ): Promise<Area> {
     const result = await query(
       `INSERT INTO areas (name, district_id, state_id, country_id, pincode, created_by) 
@@ -526,13 +526,13 @@ export const LocationRepository = {
   // Update State
   async updateState(
     id: string,
-    data: { name: string; code?: string | null; country_id: string }
-    // admin_id: string
+    data: { name: string; code?: string | null; country_id: string },
+    admin_id: string | null
   ): Promise<State | null> {
     const result = await query(
-      `UPDATE states SET name = $1, code = $2, country_id = $3, updated_at = NOW() 
+      `UPDATE states SET name = $1, code = $2, country_id = $3, updated_by = $5, updated_at = NOW() 
      WHERE id = $4 RETURNING id, name, code, country_id`,
-      [data.name, data.code || null, data.country_id, id]
+      [data.name, data.code || null, data.country_id, id, admin_id]
     );
     return result.rows[0] || null;
   },
@@ -540,13 +540,13 @@ export const LocationRepository = {
   // Update District
   async updateDistrict(
     id: string,
-    data: { name: string; state_id: string; country_id: string }
-    // admin_id: string
+    data: { name: string; state_id: string; country_id: string },
+    admin_id: string | null
   ): Promise<District | null> {
     const result = await query(
-      `UPDATE districts SET name = $1, state_id = $2, country_id = $3, updated_at = NOW() 
+      `UPDATE districts SET name = $1, state_id = $2, country_id = $3, updated_by = $5, updated_at = NOW() 
      WHERE id = $4 RETURNING id, name, state_id, country_id`,
-      [data.name, data.state_id, data.country_id, id]
+      [data.name, data.state_id, data.country_id, id, admin_id]
     );
     return result.rows[0] || null;
   },
@@ -561,12 +561,12 @@ export const LocationRepository = {
       country_id: string;
       pincode: string;
     },
-    admin_id: string
+    admin_id: string | null
   ): Promise<Area | null> {
     const result = await query(
-      `UPDATE areas SET name = $1, district_id = $2, state_id = $3, country_id = $4, pincode = $6, updated_by = $5, updated_at = NOW() 
+      `UPDATE areas SET name = $1, district_id = $2, state_id = $3, country_id = $4, pincode = $5, updated_by = $6, updated_at = NOW() 
      WHERE id = $7 RETURNING id, name, district_id, state_id, country_id, pincode`,
-      [data.name, data.district_id, data.state_id, data.country_id, admin_id, data.pincode, id]
+      [data.name, data.district_id, data.state_id, data.country_id, data.pincode, admin_id, id]
     );
     return result.rows[0] || null;
   },
