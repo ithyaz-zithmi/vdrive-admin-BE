@@ -1,5 +1,5 @@
 import { LocationRepository } from './location.repository';
-import { Country, State, City, Area } from './location.model';
+import { Country, State, District, Area } from './location.model';
 
 export const LocationService = {
   async getCountries(
@@ -19,25 +19,24 @@ export const LocationService = {
     return await LocationRepository.getStates(country_id, search, page, limit);
   },
 
-  async getCities(
+  async getDistricts(
+    state_id: string,
     country_id: string,
-    state_id: string | null,
     search: string,
     page: number,
     limit: number
-  ): Promise<{ data: City[]; total: number }> {
-    return await LocationRepository.getCities(country_id, state_id, search, page, limit);
+  ): Promise<{ data: District[]; total: number }> {
+    return await LocationRepository.getDistricts(state_id, country_id, search, page, limit);
   },
 
   async getAreas(
-    country_id: string,
+    district_id: string,
     state_id: string | null,
-    city_id: string | null,
     search: string | '',
     page: number,
     limit: number
   ): Promise<{ data: Area[]; total: number }> {
-    return await LocationRepository.getAreas(country_id, state_id, city_id, search, page, limit);
+    return await LocationRepository.getAreas(district_id, state_id, search, page, limit);
   },
 
   async getFullLocation(area_id: string): Promise<any> {
@@ -48,12 +47,48 @@ export const LocationService = {
     return location;
   },
 
-  async addCountry(data: {
-    country_code: string;
-    country_name: string;
-    country_flag?: string | null;
-  }): Promise<Country> {
-    const existingCountry = await LocationRepository.getCountryByCountryCode(data.country_code);
+  async getLocationByPincode(pincode: string): Promise<any> {
+    const location = await LocationRepository.getLocationByPincode(pincode);
+    if (!location) {
+      throw { statusCode: 404, message: 'Location not found for this pincode' };
+    }
+    return location;
+  },
+
+  async getCountryById(id: string): Promise<Country> {
+    const country = await LocationRepository.getCountryById(id);
+    if (!country) {
+      throw { statusCode: 404, message: 'Country not found' };
+    }
+    return country;
+  },
+
+  async getStateById(id: string): Promise<State> {
+    const state = await LocationRepository.getStateById(id);
+    if (!state) {
+      throw { statusCode: 404, message: 'State not found' };
+    }
+    return state;
+  },
+
+  async getDistrictById(id: string): Promise<District> {
+    const district = await LocationRepository.getDistrictById(id);
+    if (!district) {
+      throw { statusCode: 404, message: 'District not found' };
+    }
+    return district;
+  },
+
+  async getAreaById(id: string): Promise<Area> {
+    const area = await LocationRepository.getAreaById(id);
+    if (!area) {
+      throw { statusCode: 404, message: 'Area not found' };
+    }
+    return area;
+  },
+
+  async addCountry(data: { code: string; name: string; flag?: string | null }): Promise<Country> {
+    const existingCountry = await LocationRepository.getCountryByCountryCode(data.code);
     if (existingCountry) {
       throw { statusCode: 409, message: 'Country ID already exists' };
     }
@@ -61,13 +96,14 @@ export const LocationService = {
   },
 
   async addState(data: {
-    state_code?: string | null;
-    state_name: string;
+    code?: string | null;
+    name: string;
     country_id: string;
+    created_by?: string;
   }): Promise<State> {
-    if (data.state_code) {
+    if (data.code) {
       const existingState = await LocationRepository.getStateByStateCode(
-        data.state_code,
+        data.code,
         data.country_id
       );
       if (existingState) {
@@ -78,52 +114,153 @@ export const LocationService = {
     if (!country) {
       throw { statusCode: 404, message: 'Country not found' };
     }
-    return await LocationRepository.createState(data);
+    return await LocationRepository.createState(data, data.created_by || null);
   },
 
-  async addCity(data: {
-    city_name: string;
-    state_id?: string | null;
+  async addDistrict(data: {
+    name: string;
+    state_id: string;
     country_id: string;
-  }): Promise<City> {
+    created_by?: string;
+  }): Promise<District> {
     if (data.state_id) {
-      const existingCity = await LocationRepository.getCityByCityName(
-        data.city_name,
+      const existingDistrict = await LocationRepository.getDistrictByName(
+        data.name,
         data.state_id,
         data.country_id
       );
-      if (existingCity) {
-        throw { statusCode: 409, message: 'City already exists' };
+      if (existingDistrict) {
+        throw { statusCode: 409, message: 'District already exists' };
       }
       const state = await LocationRepository.getStateById(data.state_id);
       if (!state) {
         throw { statusCode: 404, message: 'State not found' };
       }
     }
-    return await LocationRepository.createCity(data);
+    return await LocationRepository.createDistrict(data, data.created_by || null);
   },
   async addArea(data: {
-    place: string;
-    city_id?: string | null;
-    state_id?: string | null;
+    name: string;
+    district_id: string;
+    state_id: string;
     country_id: string;
-    zipcode?: string | null;
+    pincode: string;
+    created_by?: string;
   }): Promise<Area> {
-    if (data.city_id) {
+    if (data.district_id) {
       const existingArea = await LocationRepository.getAreaByAreaName(
-        data.place,
-        data.city_id || null,
-        data.state_id || null,
+        data.name,
+        data.district_id,
+        data.state_id,
         data.country_id
       );
       if (existingArea) {
         throw { statusCode: 409, message: 'Area already exists' };
       }
-      const city = await LocationRepository.getCityById(data.city_id);
-      if (!city) {
-        throw { statusCode: 404, message: 'City not found' };
+      const district = await LocationRepository.getDistrictById(data.district_id);
+      if (!district) {
+        throw { statusCode: 404, message: 'District not found' };
       }
     }
-    return await LocationRepository.createArea(data);
+    return await LocationRepository.createArea(data, data.created_by || null);
+  },
+
+  async updateCountry(
+    id: string,
+    data: { name: string; code: string; flag?: string | null }
+  ): Promise<Country> {
+    const country = await LocationRepository.getCountryById(id);
+    if (!country) throw { statusCode: 404, message: 'Country not found' };
+
+    const updated = await LocationRepository.updateCountry(id, data);
+    if (!updated) throw { statusCode: 500, message: 'Failed to update country' };
+    return updated;
+  },
+
+  async deleteCountry(id: string): Promise<boolean> {
+    const country = await LocationRepository.getCountryById(id);
+    if (!country) throw { statusCode: 404, message: 'Country not found' };
+
+    return await LocationRepository.deleteCountry(id);
+  },
+
+  async updateState(
+    id: string,
+    data: { name: string; code?: string | null; country_id: string; updated_by?: string }
+  ): Promise<State> {
+    const state = await LocationRepository.getStateById(id);
+    if (!state) throw { statusCode: 404, message: 'State not found' };
+
+    if (data.country_id) {
+      const country = await LocationRepository.getCountryById(data.country_id);
+      if (!country) throw { statusCode: 404, message: 'Country not found' };
+    }
+
+    const updated = await LocationRepository.updateState(id, data, data.updated_by || null);
+    if (!updated) throw { statusCode: 500, message: 'Failed to update state' };
+    return updated;
+  },
+
+  async deleteState(id: string): Promise<boolean> {
+    const state = await LocationRepository.getStateById(id);
+    if (!state) throw { statusCode: 404, message: 'State not found' };
+
+    return await LocationRepository.deleteState(id);
+  },
+
+  async updateDistrict(
+    id: string,
+    data: { name: string; state_id: string; country_id: string; updated_by?: string }
+  ): Promise<District> {
+    const district = await LocationRepository.getDistrictById(id);
+    if (!district) throw { statusCode: 404, message: 'District not found' };
+
+    // Validate relationships if provided (basic check)
+    if (data.state_id) {
+      const state = await LocationRepository.getStateById(data.state_id);
+      if (!state) throw { statusCode: 404, message: 'State not found' };
+    }
+
+    const updated = await LocationRepository.updateDistrict(id, data, data.updated_by || null);
+    if (!updated) throw { statusCode: 500, message: 'Failed to update district' };
+    return updated;
+  },
+
+  async deleteDistrict(id: string): Promise<boolean> {
+    const district = await LocationRepository.getDistrictById(id);
+    if (!district) throw { statusCode: 404, message: 'District not found' };
+
+    return await LocationRepository.deleteDistrict(id);
+  },
+
+  async updateArea(
+    id: string,
+    data: {
+      name: string;
+      district_id: string;
+      state_id: string;
+      country_id: string;
+      pincode: string;
+      updated_by?: string;
+    }
+  ): Promise<Area> {
+    const area = await LocationRepository.getAreaById(id);
+    if (!area) throw { statusCode: 404, message: 'Area not found' };
+
+    if (data.district_id) {
+      const district = await LocationRepository.getDistrictById(data.district_id);
+      if (!district) throw { statusCode: 404, message: 'District not found' };
+    }
+
+    const updated = await LocationRepository.updateArea(id, data, data.updated_by || null);
+    if (!updated) throw { statusCode: 500, message: 'Failed to update area' };
+    return updated;
+  },
+
+  async deleteArea(id: string): Promise<boolean> {
+    const area = await LocationRepository.getAreaById(id);
+    if (!area) throw { statusCode: 404, message: 'Area not found' };
+
+    return await LocationRepository.deleteArea(id);
   },
 };

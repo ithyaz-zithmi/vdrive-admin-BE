@@ -1,29 +1,29 @@
 export interface Country {
   id: string;
-  country_code: string;
-  country_name: string;
-  country_flag?: string | null;
+  code: string;
+  name: string;
+  flag?: string | null;
 }
 
 export interface State {
   id: string;
-  state_code?: string | null;
-  state_name: string;
+  code?: string | null;
+  name: string;
   country_id: string;
 }
 
-export interface City {
+export interface District {
   id: string;
-  city_name: string;
-  state_id?: string | null;
+  name: string;
+  state_id: string;
   country_id: string;
 }
 
 export interface Area {
   id: string;
-  place: string;
-  city_id?: string | null;
+  name: string;
+  district_id?: string | null;
   state_id?: string | null;
   country_id: string;
-  zipcode?: string | null;
+  pincode: string;
 }

@@ -61,14 +61,13 @@ export const HotspotRepository = {
   },
 
   async createHotspot(data: {
-    id: string;
     hotspot_name: string;
     fare: number;
     multiplier: number;
   }): Promise<Hotspot> {
     const result = await query(
-      'INSERT INTO hotspots (id, hotspot_name, fare, multiplier) VALUES ($1, $2, $3, $4) RETURNING *',
-      [data.id, data.hotspot_name, data.fare, data.multiplier]
+      'INSERT INTO hotspots (id, hotspot_name, fare, multiplier) VALUES (uuid_generate_v4(), $1, $2, $3) RETURNING *',
+      [data.hotspot_name, data.fare, data.multiplier]
     );
     return result.rows[0];
   },

@@ -49,7 +49,7 @@ class HotspotController {
       logger.info(`🏧 Hotspot creation: "${hotspot_name}" from ${ip}`);
 
       const hotspotData = req.body;
-      const newHotspot = await HotspotService.addHotspot(hotspotData);
+      const newHotspot = await HotspotService.createHotspot(hotspotData);
 
       logger.info(`🆕 Hotspot created: "${newHotspot.hotspot_name}" (ID: ${newHotspot.id})`);
       successResponse(res, 201, 'Hotspot added successfully', newHotspot);

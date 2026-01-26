@@ -23,14 +23,27 @@ export const LocationValidation = {
     }),
   }),
 
+  stateIdValidation: Joi.object().keys({
+    state_id: Joi.string().uuid().required().messages({
+      'string.guid': 'State ID must be a valid UUID',
+      'any.required': 'State ID is required',
+    }),
+  }),
+
+  districtIdValidation: Joi.object().keys({
+    district_id: Joi.string().uuid().required().messages({
+      'string.guid': 'District ID must be a valid UUID',
+      'any.required': 'District ID is required',
+    }),
+  }),
+
   statesQueryValidation: Joi.object().keys({
     page: Joi.number().integer().min(1).default(1),
     limit: Joi.number().integer().min(1).max(100).default(20),
     search: Joi.string().optional(),
   }),
 
-  citiesQueryValidation: Joi.object().keys({
-    state_id: Joi.string().uuid().optional(),
+  districtsQueryValidation: Joi.object().keys({
     page: Joi.number().integer().min(1).default(1),
     limit: Joi.number().integer().min(1).max(100).default(20),
     search: Joi.string().optional(),
@@ -38,27 +51,26 @@ export const LocationValidation = {
 
   areasQueryValidation: Joi.object().keys({
     state_id: Joi.string().uuid().optional(),
-    city_id: Joi.string().uuid().optional(),
     page: Joi.number().integer().min(1).default(1),
     limit: Joi.number().integer().min(1).max(100).default(20),
     search: Joi.string().optional(),
   }),
 
   createCountryValidation: Joi.object().keys({
-    country_code: Joi.string().required().messages({
+    code: Joi.string().required().messages({
       'any.required': 'Country code is required',
     }),
-    country_name: Joi.string().required().messages({
+    name: Joi.string().required().messages({
       'any.required': 'Country name is required',
     }),
-    country_flag: Joi.string().optional(),
+    flag: Joi.string().optional(),
   }),
 
   createStateValidation: Joi.object().keys({
-    state_code: Joi.string().required().messages({
+    code: Joi.string().required().messages({
       'any.required': 'State code is required',
     }),
-    state_name: Joi.string().required().messages({
+    name: Joi.string().required().messages({
       'any.required': 'State name is required',
     }),
     country_id: Joi.string().uuid().required().messages({
@@ -67,26 +79,62 @@ export const LocationValidation = {
     }),
   }),
 
-  createCityValidation: Joi.object().keys({
-    city_name: Joi.string().required().messages({
-      'any.required': 'City name is required',
+  createDistrictValidation: Joi.object().keys({
+    name: Joi.string().required().messages({
+      'any.required': 'District name is required',
     }),
     country_id: Joi.string().uuid().required().messages({
       'string.guid': 'Country ID must be a valid UUID',
       'any.required': 'Country ID is required',
     }),
-    state_id: Joi.string().uuid().optional(),
+    state_id: Joi.string().uuid().required().messages({
+      'string.guid': 'State ID must be a valid UUID',
+      'any.required': 'State ID is required',
+    }),
   }),
 
   createAreaValidation: Joi.object().keys({
-    area_name: Joi.string().required().messages({
+    name: Joi.string().required().messages({
       'any.required': 'Area name is required',
     }),
     country_id: Joi.string().uuid().required().messages({
       'string.guid': 'Country ID must be a valid UUID',
       'any.required': 'Country ID is required',
     }),
-    state_id: Joi.string().uuid().optional(),
-    city_id: Joi.string().uuid().optional(),
+    state_id: Joi.string().uuid().required().messages({
+      'any.required': 'State ID is required',
+    }),
+    district_id: Joi.string().uuid().required().messages({
+      'any.required': 'District ID is required',
+    }),
+    pincode: Joi.string().required().messages({
+      'any.required': 'Pincode is required',
+    }),
+  }),
+
+  updateCountryValidation: Joi.object().keys({
+    code: Joi.string(),
+    name: Joi.string(),
+    flag: Joi.string().optional().allow(null),
+  }),
+
+  updateStateValidation: Joi.object().keys({
+    code: Joi.string(),
+    name: Joi.string(),
+    country_id: Joi.string().uuid(),
+  }),
+
+  updateDistrictValidation: Joi.object().keys({
+    name: Joi.string(),
+    state_id: Joi.string().uuid(),
+    country_id: Joi.string().uuid(),
+  }),
+
+  updateAreaValidation: Joi.object().keys({
+    name: Joi.string(),
+    district_id: Joi.string().uuid(),
+    state_id: Joi.string().uuid(),
+    country_id: Joi.string().uuid(),
+    pincode: Joi.string(),
   }),
 };
