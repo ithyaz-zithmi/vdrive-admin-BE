@@ -3,7 +3,7 @@ import { DriverTimeSlotsPricing } from './driverTimeSlotsPricing.model';
 export interface PricingFareRule {
   id: string;
   district_id: string;
-  city_id: string | null;
+  area_id: string | null;
   global_price: number;
   is_hotspot: boolean;
   hotspot_id: string | null;
@@ -12,10 +12,11 @@ export interface PricingFareRule {
 
 export interface FareSummary {
   id: string;
-  city_name: string | null;
-  city_id: string | null;
-  area_name: string;
-  area_id: string;
+  district_name: string;
+  district_id: string;
+  area_name: string | null;
+  area_id: string | null;
+  pincode: string | null;
   global_price: number;
   is_hotspot: boolean;
   hotspot_id: string | null;

@@ -10,7 +10,7 @@ class PricingFareRulesController {
         search = '',
         page = 1,
         limit = 10,
-        city_id,
+        area_id,
         district_id,
         is_hotspot,
         include_time_slots,
@@ -22,12 +22,12 @@ class PricingFareRulesController {
 
       const filters = {
         search: search as string,
-        city_id: city_id as string | undefined,
+        area_id: area_id as string | undefined,
         district_id: district_id as string | undefined,
         is_hotspot: is_hotspot === 'true' ? true : is_hotspot === 'false' ? false : undefined,
       };
 
-      const includeSlots = include_time_slots === 'true';
+      const includeSlots = include_time_slots === 'true' || true;
 
       const fareRules = await PricingFareRulesService.getPricingFareRules(
         filters,

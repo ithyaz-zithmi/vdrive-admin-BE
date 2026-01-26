@@ -6,7 +6,7 @@ export const PricingFareRulesValidation = {
     page: Joi.number().integer().min(1).default(1),
     limit: Joi.number().integer().min(1).max(100).default(20),
     search: Joi.string().optional(),
-    city_id: Joi.string().uuid().optional(),
+    area_id: Joi.string().uuid().optional(),
     district_id: Joi.string().uuid().optional(),
     is_hotspot: Joi.boolean().optional(),
     include_time_slots: Joi.boolean().optional(),
@@ -27,8 +27,8 @@ export const PricingFareRulesValidation = {
         'string.guid': 'Invalid district ID format',
         'any.required': 'District ID is required',
       }),
-      city_id: Joi.string().uuid().optional().allow(null).messages({
-        'string.guid': 'Invalid city ID format',
+      area_id: Joi.string().uuid().optional().allow(null).messages({
+        'string.guid': 'Invalid area ID format',
       }),
       global_price: Joi.number().precision(2).min(0).required().messages({
         'number.min': 'Global price must be greater than or equal to 0',
@@ -65,8 +65,8 @@ export const PricingFareRulesValidation = {
       district_id: Joi.string().uuid().optional().allow(null).messages({
         'string.guid': 'Invalid district ID format',
       }),
-      city_id: Joi.string().uuid().optional().allow(null).messages({
-        'string.guid': 'Invalid city ID format',
+      area_id: Joi.string().uuid().optional().allow(null).messages({
+        'string.guid': 'Invalid area ID format',
       }),
       global_price: Joi.number().precision(2).min(0).optional().messages({
         'number.min': 'Global price must be greater than or equal to 0',
@@ -107,8 +107,8 @@ export const PricingFareRulesValidation = {
         'string.guid': 'Invalid district ID format',
         'any.required': 'District ID is required',
       }),
-      city_id: Joi.string().uuid().optional().allow(null).messages({
-        'string.guid': 'Invalid city ID format',
+      area_id: Joi.string().uuid().optional().allow(null).messages({
+        'string.guid': 'Invalid area ID format',
       }),
       global_price: Joi.number().precision(2).min(0).required().messages({
         'number.min': 'Global price must be greater than or equal to 0',
@@ -188,8 +188,8 @@ export const PricingFareRulesValidation = {
       district_id: Joi.string().uuid().optional().allow(null).messages({
         'string.guid': 'Invalid district ID format',
       }),
-      city_id: Joi.string().uuid().optional().allow(null).messages({
-        'string.guid': 'Invalid city ID format',
+      area_id: Joi.string().uuid().optional().allow(null).messages({
+        'string.guid': 'Invalid area ID format',
       }),
       global_price: Joi.number().precision(2).min(0).optional().messages({
         'number.min': 'Global price must be greater than or equal to 0',

@@ -8,12 +8,13 @@ export const PricingFareRulesRepository = {
   async getPricingFareRules(
     filters: {
       search?: string;
-      city_id?: string;
+      area_id?: string;
       district_id?: string;
       is_hotspot?: boolean;
     },
     page: number,
-    limit: number
+    limit: number,
+    includeTimeSlots?: boolean
   ): Promise<{ data: FareSummary[]; total: number }> {
     const offset = (page - 1) * limit;
     const params: any[] = [];
@@ -21,9 +22,9 @@ export const PricingFareRulesRepository = {
     let paramIndex = 1;
 
     // Build dynamic WHERE conditions
-    if (filters.city_id) {
-      whereConditions.push(`p.city_id = $${paramIndex}`);
-      params.push(filters.city_id);
+    if (filters.area_id) {
+      whereConditions.push(`p.area_id = $${paramIndex}`); // Assuming city_id maps to area_id
+      params.push(filters.area_id);
       paramIndex++;
     }
 
@@ -41,7 +42,7 @@ export const PricingFareRulesRepository = {
 
     if (filters.search) {
       whereConditions.push(
-        `(c.city_name ILIKE $${paramIndex} OR a.place ILIKE $${paramIndex} OR h.hotspot_name ILIKE $${paramIndex})`
+        `(d.name ILIKE $${paramIndex} OR a.name ILIKE $${paramIndex} OR h.hotspot_name ILIKE $${paramIndex})`
       );
       params.push(`%${filters.search}%`);
       paramIndex++;
@@ -53,35 +54,54 @@ export const PricingFareRulesRepository = {
     const countQuery = `
       SELECT COUNT(*) 
       FROM price_and_fare_rules p
-      LEFT JOIN cities c ON p.city_id = c.id
-      JOIN areas a ON p.district_id = a.id
+      LEFT JOIN areas a ON p.area_id = a.id
+      LEFT JOIN districts d ON p.district_id = d.id
       LEFT JOIN hotspots h ON p.hotspot_id = h.id
       ${whereClause}
     `;
     const countResult = await query(countQuery, params);
     const total = parseInt(countResult.rows[0].count, 10);
 
-    // Get paginated data using the view
     const dataQuery = `
-      SELECT 
+    SELECT 
         p.id,
-        c.city_name,
-        c.id AS city_id,
-        a.place AS area_name,
+        d.name AS district_name,
+        d.id AS district_id,
+        a.name AS area_name,
         a.id AS area_id,
+        a.pincode AS pincode,
         p.global_price,
         p.is_hotspot,
         h.id AS hotspot_id,
         h.hotspot_name,
         p.multiplier
-      FROM price_and_fare_rules p
-      LEFT JOIN cities c ON p.city_id = c.id
-      JOIN areas a ON p.district_id = a.id
-      LEFT JOIN hotspots h ON p.hotspot_id = h.id
-      ${whereClause}
-      ORDER BY a.place, c.city_name
-      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
-    `;
+        ${
+          includeTimeSlots
+            ? `, 
+        COALESCE(
+            jsonb_agg(
+                jsonb_build_object(
+                    'id', ts.id,
+                    'day', ts.day,
+                    'from_time', ts.from_time,
+                    'to_time', ts.to_time,
+                    'price', ts.price,
+                    'driver_types', ts.driver_types
+                )
+            ) FILTER (WHERE ts.id IS NOT NULL), '[]'
+        ) AS time_slots`
+            : ''
+        }
+    FROM price_and_fare_rules p
+    LEFT JOIN areas a ON p.area_id = a.id
+    LEFT JOIN districts d ON p.district_id = d.id
+    LEFT JOIN hotspots h ON p.hotspot_id = h.id 
+    ${includeTimeSlots ? 'LEFT JOIN driver_time_slots_pricing ts ON p.id = ts.price_and_fare_rules_id' : ''}
+    ${whereClause}
+    ${includeTimeSlots ? 'GROUP BY p.id, d.id, a.id, h.id' : ''}
+    ORDER BY d.name, a.name
+    LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+`;
     params.push(limit, offset);
 
     const dataResult = await query(dataQuery, params);
@@ -92,7 +112,11 @@ export const PricingFareRulesRepository = {
    * Get a single pricing fare rule by ID
    */
   async getPricingFareRuleById(id: string): Promise<PricingFareRule | null> {
-    const result = await query('SELECT * FROM price_and_fare_rules WHERE id = $1', [id]);
+    // Map city_id to area_id for consistency in Model
+    const result = await query(
+      'SELECT id, district_id, city_id as area_id, global_price, is_hotspot, hotspot_id, multiplier FROM price_and_fare_rules WHERE id = $1',
+      [id]
+    );
     return result.rows[0] || null;
   },
 
@@ -103,18 +127,19 @@ export const PricingFareRulesRepository = {
     const queryText = `
       SELECT 
         p.id,
-        c.city_name,
-        c.id AS city_id,
-        a.place AS area_name,
+        d.name AS district_name,
+        d.id AS district_id,
+        a.name AS area_name,
         a.id AS area_id,
+        a.pincode AS pincode,
         p.global_price,
         p.is_hotspot,
         h.id AS hotspot_id,
         h.hotspot_name,
         p.multiplier
       FROM price_and_fare_rules p
-      LEFT JOIN cities c ON p.city_id = c.id
-      JOIN areas a ON p.district_id = a.id
+      LEFT JOIN areas a ON p.area_id = a.id
+      JOIN districts d ON p.district_id = d.id
       LEFT JOIN hotspots h ON p.hotspot_id = h.id
       WHERE p.id = $1
     `;
@@ -127,7 +152,7 @@ export const PricingFareRulesRepository = {
    */
   async createPricingFareRule(data: {
     district_id: string;
-    city_id?: string | null;
+    area_id?: string | null;
     global_price: number;
     is_hotspot: boolean;
     hotspot_id?: string | null;
@@ -135,12 +160,12 @@ export const PricingFareRulesRepository = {
   }): Promise<PricingFareRule> {
     const result = await query(
       `INSERT INTO price_and_fare_rules 
-        (district_id, city_id, global_price, is_hotspot, hotspot_id, multiplier) 
+        (district_id, area_id, global_price, is_hotspot, hotspot_id, multiplier) 
        VALUES ($1, $2, $3, $4, $5, $6) 
-       RETURNING *`,
+       RETURNING id, district_id, area_id, global_price, is_hotspot, hotspot_id, multiplier`,
       [
         data.district_id,
-        data.city_id || null,
+        data.area_id || null,
         data.global_price,
         data.is_hotspot,
         data.hotspot_id || null,
@@ -157,7 +182,7 @@ export const PricingFareRulesRepository = {
     id: string,
     data: {
       district_id?: string;
-      city_id?: string | null;
+      area_id?: string | null;
       global_price?: number;
       is_hotspot?: boolean;
       hotspot_id?: string | null;
@@ -173,9 +198,9 @@ export const PricingFareRulesRepository = {
       params.push(data.district_id);
       paramIndex++;
     }
-    if (data.city_id !== undefined) {
-      fields.push(`city_id = $${paramIndex}`);
-      params.push(data.city_id);
+    if (data.area_id !== undefined) {
+      fields.push(`city_id = $${paramIndex}`); // Map area_id to city_id
+      params.push(data.area_id);
       paramIndex++;
     }
     if (data.global_price !== undefined) {
@@ -204,7 +229,7 @@ export const PricingFareRulesRepository = {
     }
 
     const result = await query(
-      `UPDATE price_and_fare_rules SET ${fields.join(', ')} WHERE id = $1 RETURNING *`,
+      `UPDATE price_and_fare_rules SET ${fields.join(', ')} WHERE id = $1 RETURNING id, district_id, city_id as area_id, global_price, is_hotspot, hotspot_id, multiplier`,
       params
     );
     return result.rows[0];
@@ -225,14 +250,22 @@ export const PricingFareRulesRepository = {
    */
   async checkDuplicateArea(
     district_id: string,
-    city_id: string,
+    area_id: string | null,
     excludeId?: string
   ): Promise<boolean> {
-    const params: any[] = [district_id, city_id];
-    let query_text = 'SELECT id FROM price_and_fare_rules WHERE district_id = $1 AND city_id = $2';
+    let query_text: string;
+    const params: any[] = [district_id];
+
+    // Handle NULL area_id properly with IS NULL instead of = NULL
+    if (area_id === null) {
+      query_text = 'SELECT id FROM price_and_fare_rules WHERE district_id = $1 AND area_id IS NULL';
+    } else {
+      query_text = 'SELECT id FROM price_and_fare_rules WHERE district_id = $1 AND area_id = $2';
+      params.push(area_id);
+    }
 
     if (excludeId) {
-      query_text += ' AND id != $3';
+      query_text += ` AND id != $${params.length + 1}`;
       params.push(excludeId);
     }
 

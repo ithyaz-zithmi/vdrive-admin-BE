@@ -6,7 +6,7 @@ export const PricingFareRulesService = {
   async getPricingFareRules(
     filters: {
       search?: string;
-      city_id?: string;
+      area_id?: string;
       district_id?: string;
       is_hotspot?: boolean;
     },
@@ -14,16 +14,21 @@ export const PricingFareRulesService = {
     limit: number,
     includeTimeSlots = false
   ): Promise<{ data: FareSummary[]; total: number }> {
-    const result = await PricingFareRulesRepository.getPricingFareRules(filters, page, limit);
+    const result = await PricingFareRulesRepository.getPricingFareRules(
+      filters,
+      page,
+      limit,
+      includeTimeSlots
+    );
 
     // Optionally include time slots for each fare rule
-    if (includeTimeSlots && result.data.length > 0) {
-      for (const fareRule of result.data) {
-        fareRule.time_slots = await DriverTimeSlotsPricingRepository.getByPricingFareRuleId(
-          fareRule.id
-        );
-      }
-    }
+    // if (includeTimeSlots && result.data.length > 0) {
+    //   for (const fareRule of result.data) {
+    //     fareRule.time_slots = await DriverTimeSlotsPricingRepository.getByPricingFareRuleId(
+    //       fareRule.id
+    //     );
+    //   }
+    // }
 
     return result;
   },
@@ -42,7 +47,7 @@ export const PricingFareRulesService = {
 
   async createPricingFareRule(data: {
     district_id: string;
-    city_id?: string | null;
+    area_id?: string | null;
     global_price: number;
     is_hotspot: boolean;
     hotspot_id?: string | null;
@@ -58,16 +63,16 @@ export const PricingFareRulesService = {
       }
     }
 
-    // Check for duplicate area/city combination (only if city_id is provided)
-    if (data.city_id) {
+    // Check for duplicate area combination (only if area_id is provided)
+    if (data.area_id) {
       const isDuplicate = await PricingFareRulesRepository.checkDuplicateArea(
         data.district_id,
-        data.city_id
+        data.area_id
       );
       if (isDuplicate) {
         throw {
           statusCode: 409,
-          message: 'A pricing fare rule already exists for this area and city combination',
+          message: 'A pricing fare rule already exists for this area combination',
         };
       }
     }
@@ -89,7 +94,7 @@ export const PricingFareRulesService = {
     id: string,
     data: {
       district_id?: string;
-      city_id?: string | null;
+      area_id?: string | null;
       global_price?: number;
       is_hotspot?: boolean;
       hotspot_id?: string | null;
@@ -113,22 +118,22 @@ export const PricingFareRulesService = {
       }
     }
 
-    // If district_id or city_id is being updated, check for duplicates (only if city_id is not null)
-    if (data.district_id !== undefined || data.city_id !== undefined) {
+    // If district_id or area_id is being updated, check for duplicates (only if area_id is not null)
+    if (data.district_id !== undefined || data.area_id !== undefined) {
       const newDistrictId = data.district_id || existing.district_id;
-      const newCityId = data.city_id !== undefined ? data.city_id : existing.city_id;
+      const newAreaId = data.area_id !== undefined ? data.area_id : existing.area_id;
 
-      // Only check for duplicates if city_id is provided
-      if (newCityId) {
+      // Only check for duplicates if area_id is provided
+      if (newAreaId) {
         const isDuplicate = await PricingFareRulesRepository.checkDuplicateArea(
           newDistrictId,
-          newCityId,
+          newAreaId,
           id
         );
         if (isDuplicate) {
           throw {
             statusCode: 409,
-            message: 'A pricing fare rule already exists for this area and city combination',
+            message: 'A pricing fare rule already exists for this area combination',
           };
         }
       }
@@ -162,7 +167,7 @@ export const PricingFareRulesService = {
    */
   async createPricingRuleWithSlots(data: {
     district_id: string;
-    city_id?: string | null;
+    area_id?: string | null;
     global_price: number;
     is_hotspot: boolean;
     hotspot_id?: string | null;
@@ -185,18 +190,16 @@ export const PricingFareRulesService = {
       }
     }
 
-    // Check for duplicate area/city combination (only if city_id is provided)
-    if (data.city_id) {
-      const isDuplicate = await PricingFareRulesRepository.checkDuplicateArea(
-        data.district_id,
-        data.city_id
-      );
-      if (isDuplicate) {
-        throw {
-          statusCode: 409,
-          message: 'A pricing fare rule already exists for this area and city combination',
-        };
-      }
+    // Check for duplicate district/area combination (including null area_id)
+    const isDuplicate = await PricingFareRulesRepository.checkDuplicateArea(
+      data.district_id,
+      data.area_id ?? null
+    );
+    if (isDuplicate) {
+      throw {
+        statusCode: 409,
+        message: 'A pricing fare rule already exists for this district and area combination',
+      };
     }
 
     // Validate global_price
@@ -217,7 +220,7 @@ export const PricingFareRulesService = {
     // Create the pricing rule first
     const pricingRule = await PricingFareRulesRepository.createPricingFareRule({
       district_id: data.district_id,
-      city_id: data.city_id,
+      area_id: data.area_id,
       global_price: data.global_price,
       is_hotspot: data.is_hotspot,
       hotspot_id: data.hotspot_id,
@@ -248,7 +251,7 @@ export const PricingFareRulesService = {
     id: string,
     data: {
       district_id?: string;
-      city_id?: string | null;
+      area_id?: string | null;
       global_price?: number;
       is_hotspot?: boolean;
       hotspot_id?: string | null;
@@ -265,7 +268,7 @@ export const PricingFareRulesService = {
     // 1. Update the pricing rule itself (validation is handled inside updatePricingFareRule)
     const pricingRule = await PricingFareRulesService.updatePricingFareRule(id, {
       district_id: data.district_id,
-      city_id: data.city_id,
+      area_id: data.area_id,
       global_price: data.global_price,
       is_hotspot: data.is_hotspot,
       hotspot_id: data.hotspot_id,
