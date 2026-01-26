@@ -12,6 +12,10 @@ export interface PricingFareRule {
 
 export interface FareSummary {
   id: string;
+  country_name: string;
+  country_id: string;
+  state_name: string;
+  state_id: string;
   district_name: string;
   district_id: string;
   area_name: string | null;

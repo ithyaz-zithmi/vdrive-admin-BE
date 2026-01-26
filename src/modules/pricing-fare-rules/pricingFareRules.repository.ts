@@ -65,6 +65,10 @@ export const PricingFareRulesRepository = {
     const dataQuery = `
     SELECT 
         p.id,
+        c.name AS country_name,
+        c.id AS country_id,
+        s.name AS state_name,
+        s.id AS state_id,
         d.name AS district_name,
         d.id AS district_id,
         a.name AS area_name,
@@ -94,11 +98,13 @@ export const PricingFareRulesRepository = {
         }
     FROM price_and_fare_rules p
     LEFT JOIN areas a ON p.area_id = a.id
-    LEFT JOIN districts d ON p.district_id = d.id
+    JOIN districts d ON p.district_id = d.id
+    JOIN states s ON d.state_id = s.id
+    JOIN countries c ON s.country_id = c.id
     LEFT JOIN hotspots h ON p.hotspot_id = h.id 
     ${includeTimeSlots ? 'LEFT JOIN driver_time_slots_pricing ts ON p.id = ts.price_and_fare_rules_id' : ''}
     ${whereClause}
-    ${includeTimeSlots ? 'GROUP BY p.id, d.id, a.id, h.id' : ''}
+    ${includeTimeSlots ? 'GROUP BY p.id, c.id, s.id, d.id, a.id, h.id' : ''}
     ORDER BY d.name, a.name
     LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
 `;
@@ -127,6 +133,10 @@ export const PricingFareRulesRepository = {
     const queryText = `
       SELECT 
         p.id,
+        c.name AS country_name,
+        c.id AS country_id,
+        s.name AS state_name,
+        s.id AS state_id,
         d.name AS district_name,
         d.id AS district_id,
         a.name AS area_name,
@@ -140,6 +150,8 @@ export const PricingFareRulesRepository = {
       FROM price_and_fare_rules p
       LEFT JOIN areas a ON p.area_id = a.id
       JOIN districts d ON p.district_id = d.id
+      JOIN states s ON d.state_id = s.id
+      JOIN countries c ON s.country_id = c.id
       LEFT JOIN hotspots h ON p.hotspot_id = h.id
       WHERE p.id = $1
     `;
