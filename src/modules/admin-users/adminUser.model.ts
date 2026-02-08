@@ -3,7 +3,7 @@ export interface AdminUser {
   id: string;
   name: string;
   password: string;
-  contact: string;
+  email: string;
   alternate_contact?: string;
   role: 'admin';
   reset_token: string | null;

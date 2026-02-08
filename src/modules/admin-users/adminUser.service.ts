@@ -18,7 +18,7 @@ export const AdminUserService = {
   async createAdminUser(data: {
     name: string;
     password: string;
-    contact: string;
+    email: string;
     alternate_contact?: string;
   }) {
     // Hash password
@@ -34,7 +34,7 @@ export const AdminUserService = {
     id: string,
     data: Partial<{
       name: string;
-      contact: string;
+      email: string;
       alternate_contact?: string;
     }>
   ) {
