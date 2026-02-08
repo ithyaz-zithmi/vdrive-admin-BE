@@ -1,9 +1,7 @@
 // src/modules/users/user.model.ts// src/modules/users/user.model.ts
 export interface AdminUser {
   id: string;
-  first_name: string;
-  last_name: string;
-  full_name: string;
+  name: string;
   password: string;
   contact: string;
   alternate_contact?: string;
