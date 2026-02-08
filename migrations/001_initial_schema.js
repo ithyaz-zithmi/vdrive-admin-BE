@@ -50,9 +50,7 @@ export const up = (pgm) => {
     'admin_users',
     {
       id: { type: 'uuid', primaryKey: true, default: pgm.func('uuid_generate_v4()') },
-      first_name: { type: 'varchar(255)', notNull: true },
-      last_name: { type: 'varchar(255)', notNull: true },
-      full_name: { type: 'varchar(255)', notNull: true },
+      name: { type: 'varchar(255)', notNull: true },
       password: { type: 'text', notNull: true },
       contact: { type: 'text', unique: true, notNull: true },
       alternate_contact: { type: 'varchar(15)' },
