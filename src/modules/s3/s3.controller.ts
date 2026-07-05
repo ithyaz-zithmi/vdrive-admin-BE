@@ -6,7 +6,7 @@ import { successResponse } from '../../shared/errorHandler';
 
 export const S3Controller = {
   async generateUploadUrl(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const url = `${config.awsServiceUrl}/api/s3/generate-upload-url`;
+    const url = `${config.userDriverApiUrl}/api/s3/presigned-url`;
 
     try {
       const axiosConfig = {
@@ -15,6 +15,7 @@ export const S3Controller = {
         headers: {
           'Content-Type': 'application/json',
           Authorization: req.headers.authorization,
+          'x-api-key': config.internalServiceApiKey,
         },
         data: req.body,
         timeout: 10_000,
@@ -25,8 +26,7 @@ export const S3Controller = {
       const response = await axios(axiosConfig);
 
       logger.info(`Request processed successfully URL: ${url} `);
-      successResponse(res, response.status, 'AdminUser updated successfully', response.data);
-      return;
+      res.status(response.status).json(response.data);
     } catch (error: any) {
       next(error);
     }

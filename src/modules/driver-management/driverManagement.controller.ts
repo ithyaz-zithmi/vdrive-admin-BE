@@ -52,15 +52,74 @@ export const DriverManagementController = {
   },
 
   async createDriver(req: Request, res: Response, next: NextFunction) {
-    // Note: Creating drivers might still need to go to the main service if it involves complex onboarding
-    // For now, let's keep the user-driver-api proxy for creation if it's critical,
-    // but the request was "why not show real data" which usually refers to the list/details.
-    return res
-      .status(501)
-      .json({
-        message:
-          'Direct driver creation not yet implemented in admin-BE, please use the main service.',
+    try {
+      const {
+        first_name,
+        last_name,
+        phone_number,
+        alternate_contact,
+        email,
+        date_of_birth,
+        gender,
+        language,
+        address,
+        documents,
+      } = req.body;
+
+      // Validate required fields
+      const missingFields: string[] = [];
+      if (!first_name) missingFields.push('first_name');
+      if (!last_name) missingFields.push('last_name');
+      if (!phone_number) missingFields.push('phone_number');
+      if (!email) missingFields.push('email');
+      if (!date_of_birth) missingFields.push('date_of_birth');
+      if (!gender) missingFields.push('gender');
+      if (!address) missingFields.push('address');
+
+      if (missingFields.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Missing required fields: ${missingFields.join(', ')}`,
+        });
+      }
+
+      const driver = await DriverManagementRepository.createDriverOffline({
+        first_name,
+        last_name,
+        phone_number,
+        alternate_contact,
+        email,
+        date_of_birth,
+        gender,
+        language,
+        address,
+        documents: documents || [],
       });
+
+      // Notify user-backend about the new driver
+      notifyUserBackend('ACCOUNT_STATUS_UPDATE', {
+        driverId: driver?.id,
+        vdriveId: driver?.vdrive_id,
+        status: 'active',
+        reason: 'Offline onboarding by admin',
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: 'Driver created successfully via offline onboarding',
+        data: driver,
+      });
+    } catch (error: any) {
+      if (
+        error.message?.includes('already exists')
+      ) {
+        return res.status(409).json({
+          success: false,
+          message: error.message,
+        });
+      }
+      next(error);
+    }
   },
 
   async updateDriver(req: Request, res: Response, next: NextFunction) {
