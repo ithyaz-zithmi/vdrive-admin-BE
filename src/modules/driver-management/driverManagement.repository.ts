@@ -463,12 +463,13 @@ export class DriverManagementRepository {
       'gender',
       'role',
       'address',
+      'subscription_eligibility',
     ];
 
     for (const key of allowedFields) {
       if (data[key] !== undefined) {
-        if (key === 'address') {
-          fields.push(`address = $${counter}`);
+        if (key === 'address' || key === 'subscription_eligibility') {
+          fields.push(`${key} = $${counter}`);
           values.push(JSON.stringify(data[key]));
         } else {
           fields.push(`${key} = $${counter}`);

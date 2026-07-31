@@ -150,6 +150,13 @@ export const DriverManagementController = {
         // await FcmService.sendPushNotification(updatedDriver.id, `Account ${status}`, status_reason);
       }
 
+      if (profileData.subscription_eligibility && updatedDriver) {
+        notifyUserBackend('PLAN_ELIGIBILITY_UPDATE', {
+          driverId: updatedDriver.id,
+          eligibility: profileData.subscription_eligibility,
+        });
+      }
+
       return res.status(200).json({
         success: true,
         message: 'Driver updated successfully',
