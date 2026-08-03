@@ -5,6 +5,8 @@ import config from '../config';
 import { logger } from '../shared/logger';
 import { AuthRepository } from '../modules/auth/auth.repository';
 import { notifyUserBackend } from '../shared/eventBus';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { getRedisClient } from '../shared/redis';
 
 interface AuthToken {
   id: string;
@@ -26,6 +28,10 @@ export const initSocket = (httpServer: HttpServer): Server => {
     },
     transports: ['websocket', 'polling'],
   });
+
+  const pubClient = getRedisClient();
+  const subClient = pubClient.duplicate();
+  io.adapter(createAdapter(pubClient, subClient));
 
   // NOTE: Events from the user backend now arrive via Redis pub/sub
   // (initUserEventSubscriber in shared/eventBus.ts), not a Socket.IO `/internal`
