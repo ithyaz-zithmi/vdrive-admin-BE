@@ -28,6 +28,7 @@ import promoRoutes from '../modules/promo-management/promo.routes';
 import notificationRoutes from '../modules/notification-management/notification.routes';
 import rolesRoutes from '../modules/roles/roles.routes';
 import supportManagementRoutes from '../modules/support-management/supportManagement.routes';
+import { enquiryPublicRoutes, enquiryAdminRoutes } from '../modules/enquiry-management/enquiryManagement.routes';
 
 const router = Router();
 
@@ -42,6 +43,7 @@ router.use('/webhooks', isServiceAuthenticated, webhookRoutes);
 router.use('/pricing', pricingCalculatorRoutes);
 router.use('/webhooks', webhookRoutes);
 router.use('/coupons', openCouponRoutes);
+router.use('/enquiries', enquiryPublicRoutes);
 
 router.use(isAuthenticated);
 
@@ -70,6 +72,7 @@ router.use('/referrals', referralManagementRoutes);
 router.use('/notification-management', notificationRoutes);
 router.use('/roles', rolesRoutes);
 router.use('/support-management', supportManagementRoutes);
+router.use('/enquiries', enquiryAdminRoutes);
 
 router.get('/internal/trip-alert', (req, res) => {
   const { trip, secret } = req.body;
